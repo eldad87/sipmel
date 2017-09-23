@@ -2,29 +2,27 @@
     "name": "eldady/symfony",
     "license": "proprietary",
     "type": "project",
+    "keywords": ["symfony", "api", "sip", "jwt"],
     "autoload": {
-        "psr-4": {
-            "AppBundle\\": "src/AppBundle"
-        },
-        "classmap": [
-            "app/AppKernel.php",
-            "app/AppCache.php"
-        ]
+        "psr-4": { "": "src/" },
+        "classmap": [ "app/AppKernel.php", "app/AppCache.php" ]
     },
     "autoload-dev": {
-        "psr-4": {
-            "Tests\\": "tests/"
-        },
-        "files": [
-            "vendor/symfony/symfony/src/Symfony/Component/VarDumper/Resources/functions/dump.php"
-        ]
+        "psr-4": { "Tests\\": "tests/" }
     },
     "require": {
-        "php": ">=5.5.9",
+        "php": "^7.1.9",
         "doctrine/doctrine-bundle": "^1.6",
+        "doctrine/doctrine-cache-bundle": "^1.2",
+        "doctrine/doctrine-migrations-bundle": "^1.2",
         "doctrine/orm": "^2.5",
+        "friendsofsymfony/rest-bundle": "^2.1",
         "incenteev/composer-parameter-handler": "^2.0",
-        "sensio/distribution-bundle": "^5.0.19",
+        "jms/serializer-bundle": "^2.1",
+        "lexik/jwt-authentication-bundle": "^2.1",
+        "nelmio/api-doc-bundle": "^2.13",
+        "nelmio/cors-bundle": "^1.5",
+        "sensio/distribution-bundle": "^5.0",
         "sensio/framework-extra-bundle": "^3.0.2",
         "symfony/monolog-bundle": "^3.1.0",
         "symfony/polyfill-apcu": "^1.0",
@@ -34,7 +32,10 @@
     },
     "require-dev": {
         "sensio/generator-bundle": "^3.0",
-        "symfony/phpunit-bridge": "^3.0"
+        "symfony/phpunit-bridge": "^3.3",
+        "doctrine/doctrine-fixtures-bundle": "^2.3",
+        "phpunit/phpunit": "^5.4",
+        "guzzlehttp/guzzle": "^6.2"
     },
     "scripts": {
         "symfony-scripts": [
@@ -53,6 +54,9 @@
         ]
     },
     "config": {
+        "platform": {
+            "php": "7.1.9"
+        },
         "sort-packages": true
     },
     "extra": {
@@ -65,6 +69,8 @@
         "incenteev-parameters": {
             "file": "app/config/parameters.yml"
         },
-        "branch-alias": null
+         "branch-alias": {
+            "dev-master": "3.3-dev"
+         }
     }
 }
