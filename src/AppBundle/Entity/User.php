@@ -5,20 +5,21 @@ namespace AppBundle\Entity;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use JMS\Serializer\Annotation as JMS;
 
 /**
  * @ORM\Entity(repositoryClass="AppBundle\Repository\UserRepository")
  * @ORM\Table(name="user")
  *
+ * @UniqueEntity("email", groups={"register"})
+ * @UniqueEntity("username", groups={"register"})
+ *
  * @JMS\ExclusionPolicy("all")
  */
 class User implements UserInterface
 {
     /**
-	 * @JMS\Expose()
-	 * @JMS\Groups("register")
-	 *
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
@@ -26,46 +27,76 @@ class User implements UserInterface
     private $id;
 
 	/**
-	 * @JMS\Expose()
-	 * @JMS\Groups("register")
-	 * @JMS\Type("AppBundle\Entity\Company")
-	 *
 	 * @var Company
-	 * @ORM\ManyToOne(targetEntity="Company", inversedBy="users")
+	 *
+	 * @ORM\ManyToOne(targetEntity="Company", inversedBy="users", cascade={"persist"})
 	 * @ORM\JoinColumn(name="company_id", referencedColumnName="id")
 	 *
+	 * @JMS\Expose()
+	 * @JMS\Groups({"register", "register_response"})
+	 * @JMS\Type("AppBundle\Entity\Company")
 	 */
 	private $company;
 
 	/**
-	 *
 	 * @ORM\Column(type="boolean", nullable=false)
+	 *
+	 * @JMS\Type("boolean")
 	 */
 	private $isEnabled;
 
     /**
-     * @ORM\Column(type="string", length=25, nullable=false)
+	 * @Assert\Length(min="2", max="25", groups={"register"})
+	 *
+	 * @ORM\Column(type="string", length=25, nullable=false)
+	 *
+	 * @JMS\Expose()
+	 * @JMS\Groups({"register", "register_response"})
+	 * @JMS\Type(name="string")
      */
     private $firstName;
 
     /**
-     *
-     * @ORM\Column(type="string", length=25, nullable=false)
+	 * @Assert\Length(min="2", max="25", groups={"register"})
+	 *
+	 * @ORM\Column(type="string", length=25, nullable=false)
+	 *
+	 * @JMS\Expose()
+	 * @JMS\Groups({"register", "register_response"})
+	 * @JMS\Type(name="string")
      */
     private $lastName;
 
     /**
+	 *
+	 * @Assert\Length(min="5", max="25", groups={"register"})
+	 *
 	 * @ORM\Column(type="string", unique=true, length=25, nullable=false)
+	 *
+	 * @JMS\Expose()
+	 * @JMS\Groups({"register", "register_response", "login"})
+	 * @JMS\Type(name="string")
      */
     private $username;
 
     /**
-     * @ORM\Column(type="string", unique=true, length=50, nullable=false)
+	 * @Assert\Length(min="5", max="50", groups={"register"})
+	 * @Assert\Email(groups={"register"})
+	 *
+	 * @ORM\Column(type="string", unique=true, length=50, nullable=false)
+	 *
+	 * @JMS\Expose()
+	 * @JMS\Groups({"register", "register_response"})
+	 * @JMS\Type(name="string")
      */
     private $email;
 
     /**
-     * @ORM\Column(type="string", length=72, nullable=false)
+	 * @ORM\Column(type="string", length=72, nullable=false)
+	 *
+	 * @JMS\Expose()
+	 * @JMS\Groups({"register", "login"})
+	 * @JMS\Type(name="string")
      */
     private $password;
 

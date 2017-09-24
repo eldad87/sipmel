@@ -30,7 +30,7 @@ class JwtAuthenticator extends AbstractGuardAuthenticator
 
     public function start(Request $request, AuthenticationException $authException = null)
     {
-        return new JsonResponse(['message' => 'Authentication required!'], 401);
+		return new JsonResponse([['property_path' => 'credentials', 'message' => 'Authentication required!']], 400); //TODO: constrain or something more 2017..
     }
 
     public function getCredentials(Request $request)
@@ -63,7 +63,7 @@ class JwtAuthenticator extends AbstractGuardAuthenticator
 
         $username = $data['username'];
         $user = $this->em->getRepository('AppBundle:User')
-            ->findOneBy(['username' => $username, 'isActive' => true]);
+            ->findOneBy(['username' => $username, 'isEnabled' => true]);
 
         if (!$user) {
             throw new AuthenticationCredentialsNotFoundException();

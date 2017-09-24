@@ -75,6 +75,9 @@ lexik_jwt_authentication:
     pass_phrase:      '%jwt_key_pass_phrase%'
     token_ttl:        '%jwt_token_ttl%'
 
+sensio_framework_extra:
+    request: { converters: true }
+
 # Bundle FOSRest
 fos_rest:
     versioning:
@@ -90,8 +93,9 @@ fos_rest:
       force: true
     body_listener: true
     body_converter:
-      enabled: true
-      validate: true
+        enabled: true
+        validate: true
+        validation_errors_argument: validationErrors
     format_listener:
         rules:
             fallback_format: json
@@ -115,18 +119,36 @@ fos_rest:
         default_format: json
 
 nelmio_api_doc:
-    name: "SIPMEL"
-    sandbox:
-        enabled: true
-        authentication:
-            delivery: http # When choosing an http delivery, name defaults to Authorization, and the header value will automatically be prefixed by the corresponding type (ie. Basic or Bearer).
-            type:     bearer # pr basic
-        body_format:
-            formats:
-                # Defaults:
-                - json
-                - xml
-            default_format: json
+    documentation:
+        info:
+            title: "SIPMEL"
+            description: "Simplifying control over communication"
+            version: 1.0.0
+        securityDefinitions: #securitySchemes
+            api_key:
+                type: apiKey
+                description: json Web Token
+                name:  Authorization
+                in: header
+        security:
+            - api_key: []
+
+    routes:
+        path_patterns: # an array of regexps
+            - ^/API/[^Doc]
+
+#    name: "SIPMEL"
+#    sandbox:
+#        enabled: true
+#        authentication:
+#            delivery: http # When choosing an http delivery, name defaults to Authorization, and the header value will automatically be prefixed by the corresponding type (ie. Basic or Bearer).
+#            type:     bearer # pr basic
+#        body_format:
+#            formats:
+#                # Defaults:
+#                - json
+#                - xml
+#             default_format: json
 
 doctrine_migrations:
     dir_name: "%kernel.root_dir%/DoctrineMigrations"

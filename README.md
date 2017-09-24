@@ -84,18 +84,6 @@ Simplifying control over multimedia communication.
 
 
 # TODO:
-Finish API/User methods' validation
-
-Create response wrapper
-Handle QueryParamter Exception
-Handle unique (same email already saved) exception UniqueConstraintViolationException
-
-
-Change Routing to existing APIs
-	config.yml fos_rest need to configured with fos-rest-bundle, setup nelmio api-doc
-	routing.yml
-	security.yml
-
 Start adding methods
 
 
@@ -104,3 +92,4 @@ Start adding methods
 	- Check if email and username are available
 	- Capcha
 	- Add Company country. state. phone + Google lib phone check
+	- Reset Password

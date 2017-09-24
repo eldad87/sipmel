@@ -2,36 +2,29 @@
 
 namespace AppBundle\Controller\API;
 
-use AppBundle\Entity\Company;
-use AppBundle\Event\EmailForgotPasswordEvent;
-use AppBundle\Form\API\UserRegisterType;
-use AppBundle\Form\ForgotPasswordType;
-use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\Request\ParamFetcher;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+
+use AppBundle\Form\ChangePasswordType;
+use FOS\RestBundle\View\View;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use FOS\RestBundle\Controller\FOSRestController;
-use Symfony\Component\HttpKernel\Exception\HttpException;
-use AppBundle\Form\ChangePasswordType;
+
 use AppBundle\Entity\User;
-use AppBundle\Utils\PasswordGenerator;
+use AppBundle\Entity\Company;
+use AppBundle\Form\API\UserRegisterType;
 
-use FOS\RestBundle\Controller\Annotations\Get;
-use FOS\RestBundle\Controller\Annotations\Post;
-use FOS\RestBundle\Controller\Annotations\Put;
-use FOS\RestBundle\Controller\Annotations\Delete;
+use FOS\RestBundle\Request\ParamFetcher;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use FOS\RestBundle\Controller\Annotations as Rest;
 
-use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-use FOS\RestBundle\Controller\Annotations\View;
-use FOS\RestBundle\Controller\Annotations\RequestParam;
-use FOS\RestBundle\Controller\Annotations\QueryParam;
 
-use Symfony\Component\Security\Core\Exception\BadCredentialsException;
-use Symfony\Component\Validator\Constraints as Constraint;
+
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Swagger\Annotations as SWG;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\ConstraintViolationList;
+
 
 /**
  * @Rest\Version("v1")
@@ -42,216 +35,202 @@ use Symfony\Component\Validator\Constraints as Constraint;
 class UserController extends FOSRestController
 {
 
-
-
-
 	/**
-	 * Register a new user
-	 * @param Request $request
-	 * @param ParamFetcher $paramFetcher
-	 * @return View
-	 *
-	 * @Rest\View(serializerGroups={"register"})
-	 * @Rest\RequestParam(name="email", requirements=@Constraint\Email(), description="max 50", nullable=false, allowBlank=false)
-	 * @Rest\RequestParam(name="username", requirements=@Constraint\Length(min="5", max="25"), description="min 5, max 25", nullable=false, allowBlank=false)
-	 * @Rest\RequestParam(name="first_name", requirements=@Constraint\Length(min="2", max="25"), description="min 2, max 25", nullable=false, allowBlank=false)
-	 * @Rest\RequestParam(name="last_name", requirements=@Constraint\Length(min="2", max="25"), description="min 2, max 25", nullable=false, allowBlank=false)
-	 * @Rest\RequestParam(name="password", description="Password", nullable=false, allowBlank=false)
-	 * @Rest\RequestParam(name="company.name", description="Company Name", nullable=false, allowBlank=false)
-	 *
-	 *
 	 * @Rest\Post(path="/Register", name="registration")
 	 *
-	 * @ApiDoc(
-	 *     resource=true,
-	 *     description="Register a new User",
-	 *     views = {"v1"},
-	 *     section="User",
-	 *     output={
-	 *     	"class"="AppBundle\Entity\User\User",
-	 *     	"groups"={"register"},
-	 *     	"parsers"={"Nelmio\ApiDocBundle\Parser\JmsMetadataParse"}
-	 *     },
-	 *     statusCodes={
-	 *         201="Returned when successful",
-	 *         401="Returned when trying to create non authenticated",
-	 *         422="Returned when the profile validation failed"
-	 *      }
+	 * @SWG\Parameter(
+	 * 		name="version",
+	 *      in="path",
+	 *      description="Version",
+	 *      type="string",
+	 *      required=true,
+	 *      enum={"v1"}
 	 * )
 	 *
+	 * @SWG\Parameter(
+	 * 		name="user",
+	 *      in="body",
+	 *      description="JSON User object",
+	 *      type="json",
+	 *      required=true,
+	 *      @Model(type=User::class, groups={"register"})
+	 * )
 	 *
-	 * Disclaimer:
-	 * I know, using "company_name" paramter, I could have just used "company[name]".
-	 * 	Well, I tried. ParamFetcher use the literal key to look it's value in the request:
-	 * 		request[company[name]] -> Doesn't find anything..
-	 * 		Instead, it could have worked if it will be PATCHed into request[company][name]
-	 * Anyway, I can use:
-	 * 	Add annotation: "@ParamConverter("user", converter="fos_rest.request_body")"
-	 *  Add User $user to action: public function RegisterAction(Request $request, ParamFetcher $paramFetcher, User $user)
-	 * 	Change "@Rest\RequestParam(name="company[name]", key="company.name", description="Company Name", nullable=false, allowBlank=false)"
-	 *		With: strict=false, nullable=true, allowBlank=true
-	 * 	    But.. it won't pass any validation.
-	 * 		Yes.. I could have used the validator in the controller and add annotations in the User/Company's entities -> Its just too much :)
+	 * @SWG\Response(
+	 *      response="200",
+	 *      description="Returned when successful.",
+	 *      @Model(type=User::class, groups={"register_response"}),
+	 * )
 	 *
-	 * So I took the easiers solution.
+	 * TODO: Response 400, validation structure
+	 * @SWG\Response(
+	 *      response="400",
+	 *      description="Validation Error",
+	 *      @SWG\schema(
+	 *     		type="array",
+	 *          @SWG\items(
+	 *          	type="object",
+	 *              @SWG\Property(property="property_path", type="string"),
+	 *              @SWG\Property(property="message", type="string"),
+	 *          ),
+	 *      ),
+	 *     examples={"Invalid Email and Username"="{""property_path"":""username"",""message"":""This value is too short. It should have 5 characters or more.""},{""email"":""3089"",""message"":""This value is not a valid email address.""}"}
+	 * )
+	 * @SWG\Tag(name="user.register", description="User registration")
+	 *
+	 * @return View
+	 * @ParamConverter("user", converter="fos_rest.request_body", options={"validator"={"groups"="register"}, "deserializationContext"={"groups"={"register"}}})
 	 */
-	public function RegisterAction(Request $request, ParamFetcher $paramFetcher)
+	public function RegisterAction(User $user, ConstraintViolationList $validationErrors)
 	{
-
-		$user = new User();
-		$user->setRoles(['ROLE_ADMIN']);
-		$user->setIsEnabled(true);
-		$user->setEmail($paramFetcher->get('email'));
-		$user->setUsername($paramFetcher->get('username'));
-		$user->setFirstName($paramFetcher->get('first_name'));
-		$user->setLastName($paramFetcher->get('last_name'));
-
-		$password = $this->get('security.password_encoder')
-			->encodePassword($user, $paramFetcher->get('password'));
-		$user->setPassword($password);
-
-		$company = new Company();
-		$company->setIsEnabled(true);
-		$company->setName($paramFetcher->get('company.name'));
-		$company->addUser($user);
-
-		$em = $this->getDoctrine()->getManager();
-		$em->persist($company);
-		$em->flush();
-
-		return new JsonResponse(['status' => 'ok']);
-		echo 2;
-
-		$a = 1;
-
-		$a++;
-		die;
-
-		$user = new User();
-		$form = $this->createForm(UserRegisterType::class, $user);
-		$form->handleRequest($request);
-
-		if ($form->isValid()) {
-			$password = $this->get('security.password_encoder')
-				->encodePassword($user, $user->getPassword());
-			$user->setPassword($password);
-			$user->setRoles(['ROLE_ADMIN']);
-			$em = $this->getDoctrine()->getManager();
-			$em->persist($user);
-			$em->flush();
-
-			return new JsonResponse(['status' => 'ok']);
+		if (count($validationErrors)) {
+			return $this->view($validationErrors, Response::HTTP_BAD_REQUEST);
 		}
 
-		throw new HttpException(400, "Invalid data");
+		$user->setRoles(['ROLE_ADMIN']);
+		$user->setIsEnabled(true);
+		$password = $this->get('security.password_encoder')
+			->encodePassword($user, $user->getPassword());
+		$user->setPassword($password);
+		$user->getCompany()->setIsEnabled(true);
+
+
+		$em = $this->getDoctrine()->getManager();
+		$em->persist($user);
+		$em->flush();
+
+		return $this->view($user, 200);
 	}
 
 	/**
-	 * @View()
+	 * @Rest\Post(path="/Token/New", name="new_token")
 	 *
-	 * @ApiDoc(
-	 *  resource=true,
-	 *  description="Generate access token"
+	 * @SWG\Parameter(
+	 * 		name="version",
+	 *      in="path",
+	 *      description="Version",
+	 *      type="string",
+	 *      required=true,
+	 *      enum={"v1"}
 	 * )
 	 *
-	 * @ RequestParam(name="username", requirements={@Constraint\NotBlank()}, description="Usernmae", nullable=false)
-	 * @ RequestParam(name="password", requirements={"range"=@Constraint\Range(min="10", max=40),"len"=@Constraint\Length(min="10", max=40)}, description="Password", nullable=false)
-	 * @ Post("/Token/New", name="new_token", options={ "method_prefix" = false })
+	 * @SWG\Parameter(
+	 * 		name="user",
+	 *      in="body",
+	 *      description="JSON User login object",
+	 *      type="json",
+	 *      required=true,
+	 *      @Model(type=User::class, groups={"login"})
+	 * )
+	 *
+	 * @SWG\Response(
+	 *      response="200",
+	 *      description="Access Token",
+	 *      @SWG\Items(
+	 *     		type="object",
+	 *    	 	@SWG\Property(property="token", type="string")
+	 * 		)
+	 * )
+	 * TODO: Response 400, validation structure
+	 * @SWG\Tag(name="user.access.token", description="User Access Token")
+	 *
+	 * Param User $user
+	 * param Request $request
+	 * Param ConstraintViolationList $violations
+	 * @return View
+	 * @ParamConverter("user", converter="fos_rest.request_body", options={"validator"={"groups"="login"}, "deserializationContext"={"groups"={"login"}}})
 	 */
-	public function newTokenAction(ParamFetcher $paramFetcher, Request $request)
+	public function newTokenAction(User $user, ConstraintViolationList $validationErrors)
 	{
-		$paramFetcher->all();
+		if (count($validationErrors)) {
+			return $this->view($validationErrors, Response::HTTP_BAD_REQUEST);
+		}
 
-		$user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['username'=> $request->request->get('username')]);
-		if (!$user) {
-			throw $this->createNotFoundException();
+		$userDB = $this->getDoctrine()->getRepository(User::class)->findOneBy(['username'=> $user->getUsername()]);
+		if (!$userDB) {
+			return $this->view([['property_path' => 'username', 'message' => 'username not found or password is invalid']], 400); //TODO: constrain or something more 2017..
 		}
 
 		$isValid = $this->get('security.password_encoder')
-			->isPasswordValid($user, $request->request->get('password'));
+			->isPasswordValid($userDB, $user->getPassword());
 
 		if (!$isValid) {
-			throw new BadCredentialsException();
+			return $this->view([['property_path' => 'username', 'message' => 'username not found or password is invalid']], 400); //TODO: constrain or something more 2017..
 		}
 
 		$token = $this->get('lexik_jwt_authentication.encoder')
 			->encode([
-				'username' => $user->getUsername(),
+				'username' => $userDB->getUsername(),
 				'exp' => time() + 3600 // 1 hour expiration
 			]);
 
-		return new JsonResponse(['token' => $token]);
+		return $this->view(['token' => $token], 200);
 	}
+
 
 	/**
-	 * @View()
+	 * @Rest\Post(path="/ChangePassword", name="change_password")
 	 *
-	 * @ApiDoc(
-	 *  resource=true,
-	 *  description="Forgot Paasowrd"
+	 * @SWG\Parameter(
+	 * 		name="version",
+	 *      in="path",
+	 *      description="Version",
+	 *      type="string",
+	 *      required=true,
+	 *      enum={"v1"}
 	 * )
 	 *
-	 * @ RequestParam(
-	 *	name="email", requirements="@Constraint\Email", description="Email", nullable=false
+	 * @SWG\Parameter(
+	 * 		name="password",
+	 *      in="body",
+	 *      description="Password",
+	 *      type="string",
+	 *      required=true,
+	 *
+	 *     	@SWG\Schema(
+	 *     		type="object",
+	 *    	 	@SWG\Property(property="password_current", type="string"),
+	 *    	 	@SWG\Property(property="password_new", type="string"),
+	 *    	 	@SWG\Property(property="password_new_confirm", type="string")
+	 * 		)
 	 * )
-	 * @ Post(path="ForgotPassword", name="forgot_password", options={ "method_prefix" = false })
+	 *
+	 * @SWG\Response(
+	 *      response="200",
+	 *      description="Reset Password",
+	 *      @SWG\Items(
+	 *     		type="object",
+	 *    	 	@SWG\Property(property="status", type="string", enum={"OK", "Error"}),
+	 *    	 	@SWG\Property(property="message", type="string")
+	 * 		)
+	 * )
+	 * TODO: Response 400, validation structure
+	 * @SWG\Tag(name="user.change.forgot", description="Change Password")
+	 *
+	 * @return View
 	 */
-	public function forgotPasswordAction(Request $request/*, ParamFetcher $paramFetcher*/)
+	public function changePasswordAction(Request $request)
 	{
-		$user = new User();
-		$passwordGenerator = new PasswordGenerator();
-		$form = $this->createForm(ForgotPasswordType::class, $user);
-		$form->handleRequest($request);
-
-		if ($form->isValid()) {
-			$email = $request->request->get('email');
-			$em = $this->getDoctrine()->getManager();
-			/** @var User $userRepository */
-			$userRepository = $em->getRepository(User::class)->findOneBy(['email' => $email]);
-			$userRepository->setPassword($passwordGenerator->generatePassword());
-
-			$event = new EmailForgotPasswordEvent($userRepository);
-			$dispatcher = $this->get('event_dispatcher');
-			$dispatcher->dispatch(EmailForgotPasswordEvent::NAME, $event);
-
-			$em->persist($userRepository);
-			$em->flush();
-
-			return new JsonResponse(['status' => 'ok']);
+		if($request->request->get('password_new') != $request->request->get('password_new_confirm')) {
+			return $this->view([['property_path' => 'password_new', 'message' => 'Error']], 401); //TODO: constrain or something more 2017..
 		}
 
-		throw new HttpException(400, "Invalid data");
+		$user = $this->getUser();
+
+		$isValid = $this->get('security.password_encoder')
+			->isPasswordValid($user, $request->request->get('password_current'));
+		if (!$isValid) {
+			return $this->view([['property_path' => 'password_new', 'message' => 'Error']], 401); //TODO: constrain or something more 2017..
+		}
+
+		$passwordNew = $this->get('security.password_encoder')
+			->encodePassword($user, $request->request->get('password_new'));
+
+		$em = $this->getDoctrine()->getManager();
+		$user->setPassword($passwordNew);
+		$em->persist($user);
+		$em->flush();
+
+		return new JsonResponse(['status' => 'ok', 'message'=>'Success']);
 	}
-
-    /**
-	 * @ RequestParam(
-	 *	name="email", requirements="@Constraint\Email, @Constraint\NotBlank", description="Email", nullable=false
-	 * )
-	 * @ RequestParam(
-	 *	name="password", requirements="", description="Password", nullable=false
-	 * )
-	 * @ Post("/ChangePassword", name="change_password", options={ "method_prefix" = false })
-     */
-    public function changePasswordAction(Request $request)
-    {
-        $user = new User();
-        $form = $this->createForm(ChangePasswordType::class, $user);
-        $form->handleRequest($request);
-
-        if ($form->isValid()) {
-            $email = $request->request->get('email');
-            $password = $form->getData()->getPassword();
-            $passwordNew = $this->get('security.password_encoder')
-                               ->encodePassword($user, $user->getPassword());
-            $em = $this->getDoctrine()->getManager();
-            $userRepository = $em->getRepository(User::class)->findOneBy(['email' => $email]);
-            $userRepository->setPassword($passwordNew);
-            $em->persist($userRepository);
-            $em->flush();
-
-            return new JsonResponse(['status' => 'ok']);
-        }
-
-        throw new HttpException(400, "Invalid data");
-    }
 }

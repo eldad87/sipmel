@@ -6,10 +6,13 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as JMS;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity()
  * @ORM\Table(name="company")
+ *
+ * @JMS\ExclusionPolicy("all")
  */
 class Company
 {
@@ -22,13 +25,21 @@ class Company
 
 	/**
 	 * @var User[]
+	 *
 	 * @ORM\OneToMany(targetEntity="User", mappedBy="company", cascade={"persist", "remove"})
+	 *
 	 * @JMS\Type("ArrayCollection<AppBundle\Entity\User>"))
 	 */
 	private $users;
 
     /**
-     * @ORM\Column(type="string", length=25, nullable=false)
+	 * @Assert\Length(min="2", max="25", groups={"register"})
+	 *
+	 * @ORM\Column(type="string", length=25, nullable=false)
+	 *
+	 * @JMS\Expose()
+	 * @JMS\Groups({"register", "register_response"})
+	 * @JMS\Type(name="string")
      */
     private $name;
 
