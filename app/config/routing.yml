@@ -2,6 +2,10 @@ app:
     resource: "@AppBundle/Controller/"
     type:     annotation
 
+#For Testing
+api_basic_auth_login_check:
+    path: /API/Basic/login_check
+
 NelmioApiDocBundle:
     resource: "@NelmioApiDocBundle/Resources/config/routing/swaggerui.xml"
     prefix:   /API/Doc
@@ -12,4 +16,4 @@ REST_User:
     prefix: /API/{version}/User
     #name_prefix:  api_user_
     requirements:
-      version: v1
+        version: v1

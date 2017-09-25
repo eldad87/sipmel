@@ -272,9 +272,15 @@ class User implements UserInterface
         return array_unique($roles);
     }
 
+	/**
+	 * @param $roles
+	 * @return User
+	 */
     public function setRoles($roles)
     {
         $this->roles = $roles;
+
+        return $this;
     }
 
 	/**

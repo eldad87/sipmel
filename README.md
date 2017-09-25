@@ -65,26 +65,12 @@ Simplifying control over multimedia communication.
 	$ openssl rsa -pubout -in app/jwt/private.pem -out app/jwt/public.pem
 ```
 
-## Generate Token Authentication with Curl
-
-```
-	$ curl -H 'content-type: application/json' -v -X  POST http://127.0.0.1:8000/api/token -H 'Authorization:Basic username:password'
-```
-
-## Example JSON Web Token Authentication with Curl on resource
-
-```
-    $ curl -H 'content-type: application/json' -v -X POST -d '{"email":"myemail@example.com", "password": "mypassword"}' http://127.0.0.1:8000/api/changePassword  -H 'Authorization: Bearer :token'
-```
-
-## Example with Symfony3APIBoilerplateJWT
-
-* [How to Build an API-Only JWT Symfony App](https://github.com/Tony133/Symfony3APIBoilerplateJWTBook)
-
-
 
 # TODO:
+UTests
+RequestResponse structure
 Start adding methods
+	- CRUD list
 
 
 ## User registration
@@ -93,3 +79,4 @@ Start adding methods
 	- Capcha
 	- Add Company country. state. phone + Google lib phone check
 	- Reset Password
+	- Exception -> no route found on ^/API

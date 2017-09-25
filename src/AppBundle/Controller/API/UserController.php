@@ -3,28 +3,20 @@
 namespace AppBundle\Controller\API;
 
 
-use AppBundle\Form\ChangePasswordType;
-use FOS\RestBundle\View\View;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use FOS\RestBundle\Controller\FOSRestController;
 
 use AppBundle\Entity\User;
-use AppBundle\Entity\Company;
-use AppBundle\Form\API\UserRegisterType;
 
-use FOS\RestBundle\Request\ParamFetcher;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use FOS\RestBundle\Controller\Annotations as Rest;
-
-
-
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Swagger\Annotations as SWG;
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\ConstraintViolationList;
 
+//use FOS\RestBundle\View\View;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Swagger\Annotations as SWG;
 
 /**
  * @Rest\Version("v1")
@@ -34,7 +26,6 @@ use Symfony\Component\Validator\ConstraintViolationList;
  */
 class UserController extends FOSRestController
 {
-
 	/**
 	 * @Rest\Post(path="/Register", name="registration")
 	 *
@@ -62,13 +53,13 @@ class UserController extends FOSRestController
 	 *      @Model(type=User::class, groups={"register_response"}),
 	 * )
 	 *
-	 * TODO: Response 400, validation structure
+	 * TODO: Response 401, validation structure
 	 * @SWG\Response(
-	 *      response="400",
+	 *      response="401",
 	 *      description="Validation Error",
-	 *      @SWG\schema(
+	 *      @SWG\Schema(
 	 *     		type="array",
-	 *          @SWG\items(
+	 *          @SWG\Schema(
 	 *          	type="object",
 	 *              @SWG\Property(property="property_path", type="string"),
 	 *              @SWG\Property(property="message", type="string"),
@@ -103,7 +94,7 @@ class UserController extends FOSRestController
 	}
 
 	/**
-	 * @Rest\Post(path="/Token/New", name="new_token")
+	 * @Rest\Post(path="/Access/Token", name="access_token")
 	 *
 	 * @SWG\Parameter(
 	 * 		name="version",
@@ -131,7 +122,7 @@ class UserController extends FOSRestController
 	 *    	 	@SWG\Property(property="token", type="string")
 	 * 		)
 	 * )
-	 * TODO: Response 400, validation structure
+	 * TODO: Response 401, validation structure
 	 * @SWG\Tag(name="user.access.token", description="User Access Token")
 	 *
 	 * Param User $user
@@ -148,14 +139,14 @@ class UserController extends FOSRestController
 
 		$userDB = $this->getDoctrine()->getRepository(User::class)->findOneBy(['username'=> $user->getUsername()]);
 		if (!$userDB) {
-			return $this->view([['property_path' => 'username', 'message' => 'username not found or password is invalid']], 400); //TODO: constrain or something more 2017..
+			return $this->view([['property_path' => 'username', 'message' => 'username not found or password is invalid']], 401); //TODO: constrain or something more 2017..
 		}
 
 		$isValid = $this->get('security.password_encoder')
 			->isPasswordValid($userDB, $user->getPassword());
 
 		if (!$isValid) {
-			return $this->view([['property_path' => 'username', 'message' => 'username not found or password is invalid']], 400); //TODO: constrain or something more 2017..
+			return $this->view([['property_path' => 'username', 'message' => 'username not found or password is invalid']], 401); //TODO: constrain or something more 2017..
 		}
 
 		$token = $this->get('lexik_jwt_authentication.encoder')
@@ -167,6 +158,37 @@ class UserController extends FOSRestController
 		return $this->view(['token' => $token], 200);
 	}
 
+	/**
+	 * @Rest\Get(path="/Access/Check", name="verify_access")
+	 * @Rest\Post(path="/Access/Check", name="verify_access_post")
+	 *
+	 * @SWG\Parameter(
+	 * 		name="version",
+	 *      in="path",
+	 *      description="Version",
+	 *      type="string",
+	 *      required=true,
+	 *      enum={"v1"}
+	 * )
+	 *
+	 * @SWG\Response(
+	 *      response="200",
+	 *      description="Access Granted!",
+	 *      @SWG\Items(
+	 *     		type="object",
+	 *    	 	@SWG\Property(property="status", type="string", enum={"OK"}),
+	 *    	 	@SWG\Property(property="message", type="string")
+	 * 		)
+	 * )
+	 *
+	 * @SWG\Tag(name="user.access.check", description="User access check")
+	 *
+	 * @return View
+	 */
+	public function AccessCheckAction()
+	{
+		return $this->view(['status' => 'ok', 'message'=>'Success'], 200);
+	}
 
 	/**
 	 * @Rest\Post(path="/ChangePassword", name="change_password")
@@ -204,15 +226,27 @@ class UserController extends FOSRestController
 	 *    	 	@SWG\Property(property="message", type="string")
 	 * 		)
 	 * )
-	 * TODO: Response 400, validation structure
-	 * @SWG\Tag(name="user.change.forgot", description="Change Password")
+	 * @SWG\Response(
+	 *      response="401",
+	 *      description="Reset Password",
+	 *     @SWG\Items(
+	 *     	type="array",
+	 *      @SWG\Items(
+	 *     		type="object",
+	 *    	 	@SWG\Property(property="status", type="string", enum={"OK", "Error"}),
+	 *    	 	@SWG\Property(property="message", type="string")
+	 * 		)
+	 * 		)
+	 * )
+	 * TODO: Response 401, validation structure
+	 * @SWG\Tag(name="user.change.password", description="Change Password")
 	 *
 	 * @return View
 	 */
 	public function changePasswordAction(Request $request)
 	{
 		if($request->request->get('password_new') != $request->request->get('password_new_confirm')) {
-			return $this->view([['property_path' => 'password_new', 'message' => 'Error']], 401); //TODO: constrain or something more 2017..
+			return $this->view([['property_path' => 'password_new_confirm', 'message' => 'Passwords doesn\'t match']], 401); //TODO: constrain or something more 2017..
 		}
 
 		$user = $this->getUser();
@@ -220,7 +254,7 @@ class UserController extends FOSRestController
 		$isValid = $this->get('security.password_encoder')
 			->isPasswordValid($user, $request->request->get('password_current'));
 		if (!$isValid) {
-			return $this->view([['property_path' => 'password_new', 'message' => 'Error']], 401); //TODO: constrain or something more 2017..
+			return $this->view([['property_path' => 'password_current', 'message' => 'Error']], 401); //TODO: constrain or something more 2017..
 		}
 
 		$passwordNew = $this->get('security.password_encoder')
@@ -231,6 +265,6 @@ class UserController extends FOSRestController
 		$em->persist($user);
 		$em->flush();
 
-		return new JsonResponse(['status' => 'ok', 'message'=>'Success']);
+		return $this->view(['status' => 'ok', 'message'=>'Success'],200);
 	}
 }

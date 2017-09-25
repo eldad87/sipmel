@@ -14,3 +14,9 @@ web_profiler:
 
 swiftmailer:
     disable_delivery: true
+
+#Turn on Basic Auth for testing,
+security:
+    firewalls:
+        login:
+            security: true

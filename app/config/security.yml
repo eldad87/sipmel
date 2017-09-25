@@ -15,29 +15,39 @@ security:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
-        api_user:
-            pattern: ^/API/v[0-9]+/User/(Token/New|ForgotPassword|Register)
+            stateless: true
+        api_user_public:
+            pattern: ^/API/v[0-9]+/User/(Access/Token|ForgotPassword|Register)
             security: false
+            stateless: true
         api_doc:
             pattern: ^/API/Doc
             security: false
-        api:
+            stateless: true
+        login:
+            security: false #Disabled by default, enabled in testing
+            pattern:  ^/API/Basic/login
+            stateless: true
+            anonymous: true
+            form_login:
+                check_path:               api_basic_auth_login_check
+                success_handler:          lexik_jwt_authentication.handler.authentication_success
+                failure_handler:          lexik_jwt_authentication.handler.authentication_failure
+                require_previous_session: false
+        api_private:
             pattern:   ^/API
-            anonymous: false
-            http_basic: ~
             stateless: true
             guard:
                 authenticators:
-                    - AppBundle\Security\JwtAuthenticator
+                    - lexik_jwt_authentication.jwt_token_authenticator
 
     access_control:
-        - { path: ^/API/v[0-9]+/User/Token/New, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/API/v[0-9]+/User/ForgotPassword, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/API/v[0-9]+/User/Register, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/API/Basic/login, roles: IS_AUTHENTICATED_ANONYMOUSLY } #For Testing
+        - { path: ^/API/v[0-9]+/User/(Access/Token|ForgotPassword|Register), roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/API/Doc, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/API/v[0-9]+/User, roles: ROLE_USER }
+        - { path: ^/API/v[0-9]+/User, roles: [ROLE_USER, ROLE_API] }
         - { path: ^/API, roles: ROLE_API }
-
+        - { path: ^/, roles: IS_AUTHENTICATED_ANONYMOUSLY }
 
         # Example for resources with JSON Web Token authentication
         #- { path: ^/api/secure, roles: ROLE_ADMIN }
