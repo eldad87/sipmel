@@ -41,9 +41,15 @@ class WebAuthTestCase extends WebTestCase
 		);
 		$data = json_decode($client->getResponse()->getContent(), true);
 
-		$client = static::createClient();
-		$client->setServerParameter('HTTP_Authorization', sprintf('Bearer %s', $data['token']));
-		$client->setServerParameter('HTTP_Accept', $mimeType);
+		$client = static::createClient(array(), array(
+			'HTTP_CONTENT_TYPE' => $mimeType,
+			'HTTP_ACCEPT' 		=> $mimeType,
+			'HTTP_Content-Type' => $mimeType,
+			'HTTP_Accept' 		=> $mimeType,
+			'HTTP_Authorization'=> sprintf('Bearer %s', $data['token'])
+		));
+		/*$client->setServerParameter('HTTP_Authorization', sprintf('Bearer %s', $data['token']));
+		$client->setServerParameter('HTTP_Accept', $mimeType);*/
 
 		return $client;
 	}
