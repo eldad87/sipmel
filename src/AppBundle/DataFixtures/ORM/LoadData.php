@@ -10,31 +10,38 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 
-class LoadFixtures implements FixtureInterface, ContainerAwareInterface
+use Doctrine\Common\DataFixtures\AbstractFixture;
+
+class LoadData extends AbstractFixture implements FixtureInterface, ContainerAwareInterface
 {
 	/** @var ContainerInterface */
     private $container;
 
 	public function load(ObjectManager $manager)
 	{
+
 		$company = $this->generateCompany('cName');
-		$user = $this->generateUser($company, 'email@local.local', 'username');
+		$user = $this->generateUser($company, 'adminusername@local.local', 'adminusername', 123456);
+
 		$manager->persist($user);
 		$manager->flush();
+
+		$this->setReference($user->getUsername(), $user);
 
 		return true;
 	}
 
 	/**
 	 * Generate a Company object
-	 * @param $name
+	 * @param string $name
+	 * @param boolean $isEnabled
 	 * @return Company
 	 */
-    private function generateCompany($name='cName')
+    private function generateCompany($name='cName', $isEnabled=true)
 	{
 		$company = new Company();
 		$company->setName($name);
-
+		$company->setIsEnabled($isEnabled);
 		return $company;
 	}
 
@@ -43,13 +50,13 @@ class LoadFixtures implements FixtureInterface, ContainerAwareInterface
 	 * @param Company $company
 	 * @param $email
 	 * @param $username
+	 * @param int $password
 	 * @param $firstName
 	 * @param $lastName
-	 * @param int $password
 	 * @param array $roles
 	 * @return User
 	 */
-    private function generateUser(Company $company, $email, $username, $firstName='fName', $lastName='lName', $password=123456, $roles=['ROLE_ADMIN'])
+    private function generateUser(Company $company, $email, $username, $password=123456, $firstName='fName', $lastName='lName', $roles=['ROLE_ADMIN'], $isEnabled=true)
 	{
 		$user = new User();
 		$user->setCompany($company);
@@ -58,6 +65,7 @@ class LoadFixtures implements FixtureInterface, ContainerAwareInterface
 		$user->setFirstName($firstName);
 		$user->setLastName($lastName);
 		$user->setRoles($roles);
+		$user->setIsEnabled($isEnabled);
 
 		/** @var PasswordEncoderInterface $securityPasswordEncoder */
 		$securityPasswordEncoder = $this->container->get('security.password_encoder');

@@ -159,8 +159,7 @@ class UserController extends FOSRestController
 	}
 
 	/**
-	 * @Rest\Get(path="/Access/Check", name="verify_access")
-	 * @Rest\Post(path="/Access/Check", name="verify_access_post")
+	 * @Rest\Get(path="/Access/Check", name="access_check")
 	 *
 	 * @SWG\Parameter(
 	 * 		name="version",

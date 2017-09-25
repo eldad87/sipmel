@@ -2,6 +2,7 @@
 
 namespace Tests\AppBundle\Controller\API;
 
+use Doctrine\Common\DataFixtures\ReferenceRepository;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -13,14 +14,30 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class UserControllerTest extends WebAuthTestCase
 {
+	/** @var ReferenceRepository */
+	protected $referenceRepository;
 
-	public function testUserAccessCheck()
+	public function setUp()
 	{
-		$client = static::createAuthenticatedClient('username', '123456');
+		//Drop and Create DB all over again
+		$this->dropAndCreateDB();
+		$this->createSchema();
+
+		$this->referenceRepository = $this->loadFixtures(
+			array(
+				'AppBundle\DataFixtures\ORM\LoadData'
+			)
+		)->getReferenceRepository();
+	}
+
+	public function UserAccessCheck()
+	{
+		$this->loginAs($this->referenceRepository->getReference('adminusername'), 'api_private');
+		$client = $this->makeClient(true);
 
 		$client->request(
-			Request::METHOD_POST,
-			'/API/v1/User/Access/Check.json'
+			Request::METHOD_GET,
+			'/API/v1/User' . $this->getUrl('access_check')
 		);
 
 		$this->assertEquals('{"status":"ok","message":"Success"}', $client->getResponse()->getContent());
@@ -29,10 +46,12 @@ class UserControllerTest extends WebAuthTestCase
 
 	public function testUserChangePassword()
 	{
-		$client = static::createAuthenticatedClient('username', '123456');
+		/** @var User $user */
+		$user = $this->referenceRepository->getReference('adminusername');
+		$client = static::createAuthenticatedClient('adminusername', '123456');
 		$client->request(
 			Request::METHOD_POST,
-			'/API/v1/User/ChangePassword.json',
+			'/API/v1/User' . $this->getUrl('change_password'),
 			array(),
 			array(),
 			array(),

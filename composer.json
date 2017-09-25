@@ -31,11 +31,12 @@
         "twig/twig": "^1.0||^2.0"
     },
     "require-dev": {
-        "sensio/generator-bundle": "^3.0",
-        "symfony/phpunit-bridge": "^3.3",
         "doctrine/doctrine-fixtures-bundle": "^2.3",
+        "guzzlehttp/guzzle": "^6.2",
+        "liip/functional-test-bundle": "^1.8",
         "phpunit/phpunit": "^5.4",
-        "guzzlehttp/guzzle": "^6.2"
+        "sensio/generator-bundle": "^3.0",
+        "symfony/phpunit-bridge": "^3.3"
     },
     "scripts": {
         "symfony-scripts": [

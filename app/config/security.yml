@@ -59,6 +59,6 @@ security:
             # http://symfony.com/doc/current/cookbook/security/form_login_setup.html
 
     role_hierarchy:
-        ROLE_API:         [] #Send and manage lists
-        ROLE_ADMIN:       [ROLE_USER]
+        ROLE_API:         [] #Send and manage lists, we can add later ROLE_HELPDESK for sub components like ZendDesk etc.
+        ROLE_ADMIN:       [ROLE_USER, ROLE_API]
         ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
