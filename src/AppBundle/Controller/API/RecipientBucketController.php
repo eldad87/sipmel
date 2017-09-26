@@ -3,8 +3,8 @@
 namespace AppBundle\Controller\API;
 
 
+use AppBundle\Entity\RecipientBucket;
 use AppBundle\Entity\User;
-use AppBundle\Entity\Variable;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\FOSRestController;
@@ -19,14 +19,14 @@ use Swagger\Annotations as SWG;
 /**
  * @Rest\Version("v1")
  *
- * Manage Variables
+ * Manage RecipientBucket
  * @package AppBundle\Controller\API
  */
-class VariableController extends FOSRestController
+class RecipientBucketController extends FOSRestController
 {
 
 	/**
-	 * @Rest\Post(path="", name="variable_add")
+	 * @Rest\Post(path="", name="recipient_bucket_add")
 	 *
 	 * @SWG\Parameter(
 	 * 		name="version",
@@ -38,18 +38,18 @@ class VariableController extends FOSRestController
 	 * )
 	 *
 	 * @SWG\Parameter(
-	 * 		name="variable",
+	 * 		name="recipientBucket",
 	 *      in="body",
-	 *      description="JSON Variable object",
+	 *      description="JSON Recipient Bucket object",
 	 *      type="json",
 	 *      required=true,
-	 *      @Model(type=Variable::class, groups={"save"})
+	 *      @Model(type=RecipientBucket::class, groups={"save"})
 	 * )
 	 *
 	 * @SWG\Response(
 	 *      response="200",
 	 *      description="Returned when successful.",
-	 *      @Model(type=Variable::class, groups={"save_response"}),
+	 *      @Model(type=RecipientBucket::class, groups={"save_response"}),
 	 * )
 	 *
 	 * @SWG\Response(
@@ -65,26 +65,26 @@ class VariableController extends FOSRestController
 	 *      )
 	 * )
 	 *
-	 * @SWG\Tag(name="variable.add", description="Add Variable")
+	 * @SWG\Tag(name="recipient.bucket.add", description="Add Recipient Bucket")
 	 *
 	 * @return View
-	 * @ParamConverter("variable", converter="fos_rest.request_body", options={"validator"={"groups"="save"}, "deserializationContext"={"CompanyAware"=true,"groups"={"save"}}})
+	 * @ParamConverter("recipientBucket", converter="fos_rest.request_body", options={"validator"={"groups"="save"}, "deserializationContext"={"CompanyAware"=true,"groups"={"save"}}})
 	 */
-	public function addAction(Variable $variable, ConstraintViolationList $validationErrors)
+	public function addAction(RecipientBucket $recipientBucket, ConstraintViolationList $validationErrors)
 	{
 		if (count($validationErrors)) {
 			return $this->view($validationErrors, Response::HTTP_BAD_REQUEST);
 		}
 
 		$em = $this->getDoctrine()->getManager();
-		$em->persist($variable);
+		$em->persist($recipientBucket);
 		$em->flush();
 
-		return $this->view($variable, 200);
+		return $this->view($recipientBucket, 200);
 	}
 
 	/**
-	 * @Rest\Get(path="", name="variable_list")
+	 * @Rest\Get(path="", name="recipient_bucket_list")
 	 *
 	 * @SWG\Parameter(
 	 * 		name="version",
@@ -100,11 +100,11 @@ class VariableController extends FOSRestController
 	 *      description="Returned when successful.",
 	 *     	@SWG\Schema(
 	 *     		type="array",
-	 *      	@Model(type=Variable::class, groups={"save_response"})
+	 *      	@Model(type=RecipientBucket::class, groups={"save_response"})
 	 *	 	)
 	 * )
 	 *
-	 * @SWG\Tag(name="variable.list", description="List Variables")
+	 * @SWG\Tag(name="recipient.bucket.list", description="List Recipient Buckets")
 	 *
 	 * @return View
 	 */
@@ -113,8 +113,8 @@ class VariableController extends FOSRestController
 		/** @var User $user */
 		$user = $this->getUser();
 
-		$variables = $this->getDoctrine()->getRepository(Variable::class)
+		$recipientBuckets = $this->getDoctrine()->getRepository(RecipientBucket::class)
 			->findByCompany($user->getCompany());
-		return $this->view($variables, 200);
+		return $this->view($recipientBuckets, 200);
 	}
 }

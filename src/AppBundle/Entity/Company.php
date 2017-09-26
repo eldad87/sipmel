@@ -41,6 +41,14 @@ class Company
 	 * @JMS\Type("ArrayCollection<AppBundle\Entity\Variable>"))
 	 */
 	private $variables;
+	/**
+	 * @var ArrayCollection<RecipientBucket>
+	 *
+	 * @ORM\OneToMany(targetEntity="Variable", mappedBy="company", cascade={"persist", "remove"})
+	 *
+	 * @JMS\Type("ArrayCollection<AppBundle\Entity\RecipientBucket>"))
+	 */
+	private $recipientBuckets;
 
     /**
 	 * @Assert\Length(min="2", max="25", groups={"register"})
@@ -147,6 +155,35 @@ class Company
 	public function removeVariable($variable)
 	{
 		$this->variables->removeElement($variable);
+		return $this;
+	}
+
+	/**
+	 * Get recipientBuckets
+	 * @return ArrayCollection<RecipientBucket>
+	 */
+	public function getRecipientBuckets()
+	{
+		return $this->recipientBuckets;
+	}
+
+	/**
+	 * @param RecipientBucket $recipientBucket
+	 * @return Company
+	 */
+	public function addRecipientBucket($recipientBucket)
+	{
+		$this->recipientBuckets->add($recipientBucket);
+		return $this;
+	}
+
+	/**
+	 * @param RecipientBucket $recipientBucket
+	 * @return Company
+	 */
+	public function removeRecipientBucket($recipientBucket)
+	{
+		$this->recipientBuckets->removeElement($recipientBucket);
 		return $this;
 	}
 

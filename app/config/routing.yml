@@ -25,3 +25,11 @@ REST_Variable:
     #name_prefix:  api_user_
     requirements:
         version: v1
+
+REST_RecipientBucket:
+    resource: "@AppBundle/Controller/API/RecipientBucketController.php"
+    type: rest
+    prefix: /API/{version}/Recipient/Bucket
+    #name_prefix:  api_user_
+    requirements:
+        version: v1

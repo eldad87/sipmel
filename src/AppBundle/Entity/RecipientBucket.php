@@ -11,14 +11,14 @@ use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * @ORM\Entity()
- * @ORM\Table(name="variable", uniqueConstraints={
+ * @ORM\Table(name="recipient_list", uniqueConstraints={
  *     @ORM\UniqueConstraint(columns={"company_id", "name"})
  * })
  * @UniqueEntity(fields={"company", "name"}, groups={"save"})
  *
  * @JMS\ExclusionPolicy("all")
  */
-class Variable implements CompanyAwareInterface
+class RecipientBucket implements CompanyAwareInterface
 {
     /**
      * @ORM\Id
@@ -35,7 +35,7 @@ class Variable implements CompanyAwareInterface
 	 * @var Company
 	 * @Assert\NotBlank(groups={"save"})
 	 *
-	 * @ORM\ManyToOne(targetEntity="Company", inversedBy="variables")
+	 * @ORM\ManyToOne(targetEntity="Company", inversedBy="recipientBuckets")
 	 * @ORM\JoinColumn(name="company_id", referencedColumnName="id", nullable=false)
 	 *
 	 * @JMS\Type("AppBundle\Entity\Company")
@@ -87,7 +87,7 @@ class Variable implements CompanyAwareInterface
 
 	/**
 	 * @param Company $company
-	 * @return Variable
+	 * @return $this
 	 */
 	public function setCompany(Company $company)
 	{
@@ -105,7 +105,7 @@ class Variable implements CompanyAwareInterface
 
 	/**
 	 * @param mixed $name
-	 * @return Variable
+	 * @return $this
 	 */
 	public function setName($name)
 	{

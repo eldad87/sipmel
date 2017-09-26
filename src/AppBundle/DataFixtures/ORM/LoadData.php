@@ -3,6 +3,7 @@
 namespace AppBundle\DataFixtures\ORM;
 
 use AppBundle\Entity\Company;
+use AppBundle\Entity\RecipientBucket;
 use AppBundle\Entity\User;
 use AppBundle\Entity\Variable;
 use Doctrine\Common\DataFixtures\FixtureInterface;
@@ -27,20 +28,33 @@ class LoadData extends AbstractFixture implements FixtureInterface, ContainerAwa
 
 		$user = $this->generateUser($company, 'adminusername@local.local', 'adminusername', 123456);
 		$manager->persist($user);
-		$manager->flush();
 
 		$variable = $this->generateVariable($company, 'var1');
 		$variable2 = $this->generateVariable($company, 'var2');
 		$manager->persist($variable);
 		$manager->persist($variable2);
-		$manager->flush();
+
+		$recipientBucket = $this->generateRecipientBucker($company, 'bucket1');
+		$recipientBucket2 = $this->generateRecipientBucker($company, 'bucket2');
+		$manager->persist($recipientBucket);
+		$manager->persist($recipientBucket2);
 
 		$this->setReference($user->getUsername(), $user);
+
+		$manager->flush();
 
 		return true;
 	}
 
 
+
+    private function generateRecipientBucker(Company $company, $name='buck')
+	{
+		$recipientBucket = new RecipientBucket();
+		$recipientBucket->setCompany($company);
+		$recipientBucket->setName($name);
+		return $recipientBucket;
+	}
 
     private function generateVariable(Company $company, $name='var')
 	{

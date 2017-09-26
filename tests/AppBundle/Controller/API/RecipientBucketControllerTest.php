@@ -7,13 +7,13 @@ use Doctrine\Common\DataFixtures\ReferenceRepository;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * @group Variable
+ * @group RecipientBucket
  * @group v1
  *
- * Class VariableControllerTest
+ * Class RecipientBucketControllerTest
  * @package Tests\AppBundle\Controller
  */
-class VariableControllerTest extends WebAuthTestCase
+class RecipientBucketControllerTest extends WebAuthTestCase
 {
 	/** @var ReferenceRepository */
 	protected $referenceRepository;
@@ -31,24 +31,24 @@ class VariableControllerTest extends WebAuthTestCase
 		)->getReferenceRepository();
 	}
 
-	public function testVariableList()
+	public function testRecipientBucketList()
 	{
 		$this->loginAs($this->referenceRepository->getReference('adminusername'), 'api_private');
 		$client = $this->makeClient(true);
 
 		$client->request(
 			Request::METHOD_GET,
-			'/API/v1/Variable' . $this->getUrl('variable_list')
+			'/API/v1/Recipient/Bucket' . $this->getUrl('recipient_bucket_list')
 		);
 
-		//$this->assertEquals('[{"id":1,"name":"var1"},{"id":2,"name":"var2"}]', $client->getResponse()->getContent());
+		//$this->assertEquals('[{"id":1,"name":"bucket1"},{"id":2,"name":"bucket2"}]', $client->getResponse()->getContent());
 		$res = json_decode($client->getResponse()->getContent(), true);
-		$this->assertEquals('var1', $res[0]['name']);
-		$this->assertEquals('var2', $res[1]['name']);
+		$this->assertEquals('bucket1', $res[0]['name']);
+		$this->assertEquals('bucket2', $res[1]['name']);
 		$this->assertEquals(200, $client->getResponse()->getStatusCode());
 	}
 
-	public function testVariableAdd()
+	public function testRecipientBucketAdd()
 	{
 		$client = static::createAuthenticatedClient('adminusername', '123456');
 
@@ -57,18 +57,18 @@ class VariableControllerTest extends WebAuthTestCase
 
 		$client->request(
 			Request::METHOD_POST,
-			'/API/v1/Variable' . $this->getUrl('variable_list'),
+			'/API/v1/Recipient/Bucket' . $this->getUrl('recipient_bucket_add'),
 			array(),
 			array(),
 			array(),
 			json_encode(array(
-				'name'			=>'var3'
+				'name'			=>'bucket3'
 			))
 		);
 
-		//$this->assertEquals('{"id":3,"name":"var3"}', $client->getResponse()->getContent());
+		//$this->assertEquals('{"id":3,"name":"bucket3"}', $client->getResponse()->getContent());
 		$res = json_decode($client->getResponse()->getContent(), true);
-		$this->assertEquals('var3', $res['name']);
+		$this->assertEquals('bucket3', $res['name']);
 		$this->assertEquals(200, $client->getResponse()->getStatusCode());
 	}
 }

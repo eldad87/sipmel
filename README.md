@@ -73,11 +73,11 @@ Simplifying control over multimedia communication.
 
 
 # TODO:
-app/jwt/*.pem files
+Slug instead of ID
 RequestResponse structure
+app/jwt/*.pem files
 Start adding methods
 	- CRUD list
-VariableController::addAction - build unique(company, name) Constraint - there is a bug with annotation implementation of: @UniqueEntity(fields={"company", "name"}, groups={"save"})
 
 ## User registration
 	- Email confirmation
