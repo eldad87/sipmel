@@ -53,7 +53,7 @@ class VariableController extends FOSRestController
 	 * )
 	 *
 	 * @SWG\Response(
-	 *      response="401",
+	 *      response="400",
 	 *      description="Validation Error",
 	 *      @SWG\Schema(
 	 *     		type="array",
@@ -68,7 +68,7 @@ class VariableController extends FOSRestController
 	 * @SWG\Tag(name="variable.add", description="Add Variable")
 	 *
 	 * @return View
-	 * @ParamConverter("variable", converter="fos_rest.request_body", options={"validator"={"groups"="save"}, "deserializationContext"={"groups"={"save"}}})
+	 * @ParamConverter("variable", converter="fos_rest.request_body", options={"validator"={"groups"="save"}, "deserializationContext"={"CompanyAware"=true,"groups"={"save"}}})
 	 *
 	 * TODO: Variable entity need to be Unique(company, name) - but it doesn't work.
 	 * 		Meanwhile, there is a unique index in DB.

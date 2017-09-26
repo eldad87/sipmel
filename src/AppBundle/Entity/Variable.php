@@ -2,6 +2,7 @@
 
 namespace AppBundle\Entity;
 
+use AppBundle\Request\API\CompanyAwareInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -17,7 +18,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
  *
  * @JMS\ExclusionPolicy("all")
  */
-class Variable
+class Variable implements CompanyAwareInterface
 {
     /**
      * @ORM\Id
@@ -32,9 +33,10 @@ class Variable
 
 	/**
 	 * @var Company
+	 * @Assert\NotBlank(groups={"save"})
 	 *
-	 * @ORM\ManyToOne(targetEntity="Company", inversedBy="variables", cascade={"persist"})
-	 * @ORM\JoinColumn(name="company_id", referencedColumnName="id")
+	 * @ORM\ManyToOne(targetEntity="Company", inversedBy="variables")
+	 * @ORM\JoinColumn(name="company_id", referencedColumnName="id", nullable=false)
 	 *
 	 * @JMS\Type("AppBundle\Entity\Company")
 	 */
@@ -76,9 +78,9 @@ class Variable
 	}
 
 	/**
-	 * @return Company
+	 * @return Company|Null
 	 */
-	public function getCompany(): Company
+	public function getCompany()
 	{
 		return $this->company;
 	}
@@ -87,7 +89,7 @@ class Variable
 	 * @param Company $company
 	 * @return Variable
 	 */
-	public function setCompany(Company $company): Variable
+	public function setCompany(Company $company)
 	{
 		$this->company = $company;
 		return $this;

@@ -2,6 +2,7 @@
 
 namespace AppBundle\Entity;
 
+use AppBundle\Request\API\CompanyAwareInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -18,7 +19,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
  *
  * @JMS\ExclusionPolicy("all")
  */
-class User implements UserInterface
+class User implements UserInterface, CompanyAwareInterface
 {
     /**
      * @ORM\Id
@@ -29,9 +30,10 @@ class User implements UserInterface
 
 	/**
 	 * @var Company
+	 * @Assert\NotBlank(groups={"save"})
 	 *
-	 * @ORM\ManyToOne(targetEntity="Company", inversedBy="users", cascade={"persist"})
-	 * @ORM\JoinColumn(name="company_id", referencedColumnName="id")
+	 * @ORM\ManyToOne(targetEntity="Company", inversedBy="users")
+	 * @ORM\JoinColumn(name="company_id", referencedColumnName="id", nullable=false)
 	 *
 	 * @JMS\Expose()
 	 * @JMS\Groups({"register", "register_response"})

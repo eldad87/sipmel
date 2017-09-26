@@ -53,9 +53,8 @@ class UserController extends FOSRestController
 	 *      @Model(type=User::class, groups={"register_response"}),
 	 * )
 	 *
-	 * TODO: Response 401, validation structure
 	 * @SWG\Response(
-	 *      response="401",
+	 *      response="400",
 	 *      description="Validation Error",
 	 *      @SWG\Schema(
 	 *     		type="array",
@@ -86,9 +85,14 @@ class UserController extends FOSRestController
 		$user->getCompany()->setIsEnabled(true);
 
 
+		$this->getDoctrine()->getConnection()->beginTransaction();
 		$em = $this->getDoctrine()->getManager();
+		$em->persist($user->getCompany());
+		$em->flush();
+
 		$em->persist($user);
 		$em->flush();
+		$this->getDoctrine()->getConnection()->commit();
 
 		return $this->view($user, 200);
 	}
@@ -226,7 +230,7 @@ class UserController extends FOSRestController
 	 * 		)
 	 * )
 	 * @SWG\Response(
-	 *      response="401",
+	 *      response="400",
 	 *      description="Reset Password",
 	 *     @SWG\Items(
 	 *     	type="array",

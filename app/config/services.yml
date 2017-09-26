@@ -36,3 +36,8 @@ services:
         arguments: ['@mailer']
         tags:
             - { name: kernel.event_listener, event: forgot.password.event.email_fogot_password_event, method: onMailForgotPasswordEvent }
+
+    company.aware.subscriber:
+        class: AppBundle\Request\API\CompanyAwareSubscriber
+        tags:
+            - { name: jms_serializer.event_subscriber }

@@ -44,6 +44,7 @@ class Company
 
     /**
 	 * @Assert\Length(min="2", max="25", groups={"register"})
+	 * @Assert\NotBlank(groups={"register"})
 	 *
 	 * @ORM\Column(type="string", length=25, nullable=false)
 	 *
