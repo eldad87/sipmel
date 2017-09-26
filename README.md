@@ -56,6 +56,12 @@ Simplifying control over multimedia communication.
 		- Country
 		- Recipient Channel Provider (Gmail, Verizon etc.)
 
+---
+	variable
+	list
+	variable_list
+	
+---
 
 ## Generate the SSH keys
 
@@ -67,11 +73,11 @@ Simplifying control over multimedia communication.
 
 
 # TODO:
-UTests
+app/jwt/*.pem files
 RequestResponse structure
 Start adding methods
 	- CRUD list
-
+VariableController::addAction - build unique(company, name) Constraint - there is a bug with annotation implementation of: @UniqueEntity(fields={"company", "name"}, groups={"save"})
 
 ## User registration
 	- Email confirmation

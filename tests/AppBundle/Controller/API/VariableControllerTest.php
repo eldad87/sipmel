@@ -2,17 +2,18 @@
 
 namespace Tests\AppBundle\Controller\API;
 
+use AppBundle\Entity\User;
 use Doctrine\Common\DataFixtures\ReferenceRepository;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * @group User
+ * @group Variable
  * @group v1
  *
- * Class UserControllerTest
+ * Class VariableControllerTest
  * @package Tests\AppBundle\Controller
  */
-class UserControllerTest extends WebAuthTestCase
+class VariableControllerTest extends WebAuthTestCase
 {
 	/** @var ReferenceRepository */
 	protected $referenceRepository;
@@ -30,37 +31,44 @@ class UserControllerTest extends WebAuthTestCase
 		)->getReferenceRepository();
 	}
 
-	public function testUserAccessCheck()
+	public function testVariableList()
 	{
 		$this->loginAs($this->referenceRepository->getReference('adminusername'), 'api_private');
 		$client = $this->makeClient(true);
 
 		$client->request(
 			Request::METHOD_GET,
-			'/API/v1/User' . $this->getUrl('access_check')
+			'/API/v1/Variable' . $this->getUrl('variable_list')
 		);
 
-		$this->assertEquals('{"status":"ok","message":"Success"}', $client->getResponse()->getContent());
+		$this->assertEquals('[{"id":1,"name":"var1"},{"id":2,"name":"var2"}]', $client->getResponse()->getContent());
+		$res = json_decode($client->getResponse()->getContent(), true);
+		$this->assertEquals('var1', $res[0]['name']);
+		$this->assertEquals('var2', $res[1]['name']);
 		$this->assertEquals(200, $client->getResponse()->getStatusCode());
 	}
 
-	public function testUserChangePassword()
+	public function testVariableAdd()
 	{
 		$client = static::createAuthenticatedClient('adminusername', '123456');
+
+		/** @var User $user */
+		$user = $this->referenceRepository->getReference('adminusername');
+
 		$client->request(
 			Request::METHOD_POST,
-			'/API/v1/User' . $this->getUrl('change_password'),
+			'/API/v1/Variable' . $this->getUrl('variable_list'),
 			array(),
 			array(),
 			array(),
 			json_encode(array(
-				'password_new'			=>'123456',
-				'password_new_confirm'	=>'123456',
-				'password_current'		=>'123456',
+				'name'			=>'var3'
 			))
 		);
 
-		$this->assertEquals('{"status":"ok","message":"Success"}', $client->getResponse()->getContent());
+		$this->assertEquals('{"id":3,"name":"var3"}', $client->getResponse()->getContent());
+		$res = json_decode($client->getResponse()->getContent(), true);
+		$this->assertEquals('var3', $res['name']);
 		$this->assertEquals(200, $client->getResponse()->getStatusCode());
 	}
 }

@@ -4,6 +4,7 @@ namespace AppBundle\DataFixtures\ORM;
 
 use AppBundle\Entity\Company;
 use AppBundle\Entity\User;
+use AppBundle\Entity\Variable;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -21,14 +22,32 @@ class LoadData extends AbstractFixture implements FixtureInterface, ContainerAwa
 	{
 
 		$company = $this->generateCompany('cName');
-		$user = $this->generateUser($company, 'adminusername@local.local', 'adminusername', 123456);
+		$manager->persist($company);
+		$manager->flush();
 
+		$user = $this->generateUser($company, 'adminusername@local.local', 'adminusername', 123456);
 		$manager->persist($user);
+		$manager->flush();
+
+		$variable = $this->generateVariable($company, 'var1');
+		$variable2 = $this->generateVariable($company, 'var2');
+		$manager->persist($variable);
+		$manager->persist($variable2);
 		$manager->flush();
 
 		$this->setReference($user->getUsername(), $user);
 
 		return true;
+	}
+
+
+
+    private function generateVariable(Company $company, $name='var')
+	{
+		$variable = new Variable();
+		$variable->setCompany($company);
+		$variable->setName($name);
+		return $variable;
 	}
 
 	/**

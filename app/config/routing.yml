@@ -17,3 +17,11 @@ REST_User:
     #name_prefix:  api_user_
     requirements:
         version: v1
+
+REST_Variable:
+    resource: "@AppBundle/Controller/API/VariableController.php"
+    type: rest
+    prefix: /API/{version}/Variable
+    #name_prefix:  api_user_
+    requirements:
+        version: v1

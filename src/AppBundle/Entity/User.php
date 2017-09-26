@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use JMS\Serializer\Annotation as JMS;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * @ORM\Entity(repositoryClass="AppBundle\Repository\UserRepository")
@@ -104,6 +105,22 @@ class User implements UserInterface
      * @ORM\Column(type="json_array")
      */
     private $roles;
+
+	/**
+	 * @var \DateTime $created
+	 *
+	 * @Gedmo\Timestampable(on="create")
+	 * @ORM\Column(type="datetime")
+	 */
+	private $created;
+
+	/**
+	 * @var \DateTime $updated
+	 *
+	 * @Gedmo\Timestampable(on="update")
+	 * @ORM\Column(type="datetime")
+	 */
+	private $updated;
 
     /**
      * Get id
@@ -282,6 +299,16 @@ class User implements UserInterface
 
         return $this;
     }
+
+	public function getCreated()
+	{
+		return $this->created;
+	}
+
+	public function getUpdated()
+	{
+		return $this->updated;
+	}
 
 	/**
      * Returns the salt that was originally used to encode the password.

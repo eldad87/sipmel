@@ -7,6 +7,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as JMS;
 use Symfony\Component\Validator\Constraints as Assert;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * @ORM\Entity()
@@ -24,13 +25,22 @@ class Company
     private $id;
 
 	/**
-	 * @var User[]
+	 * @var ArrayCollection<User>
 	 *
 	 * @ORM\OneToMany(targetEntity="User", mappedBy="company", cascade={"persist", "remove"})
 	 *
 	 * @JMS\Type("ArrayCollection<AppBundle\Entity\User>"))
 	 */
 	private $users;
+	
+	/**
+	 * @var ArrayCollection<Variable>
+	 *
+	 * @ORM\OneToMany(targetEntity="Variable", mappedBy="company", cascade={"persist", "remove"})
+	 *
+	 * @JMS\Type("ArrayCollection<AppBundle\Entity\Variable>"))
+	 */
+	private $variables;
 
     /**
 	 * @Assert\Length(min="2", max="25", groups={"register"})
@@ -49,9 +59,26 @@ class Company
      */
     private $isEnabled;
 
+	/**
+	 * @var \DateTime $created
+	 *
+	 * @Gedmo\Timestampable(on="create")
+	 * @ORM\Column(type="datetime")
+	 */
+	private $created;
+
+	/**
+	 * @var \DateTime $updated
+	 *
+	 * @Gedmo\Timestampable(on="update")
+	 * @ORM\Column(type="datetime")
+	 */
+	private $updated;
+
 	public function __construct()
 	{
 		$this->users = new ArrayCollection();
+		$this->variables = new ArrayCollection();
 	}
 
     /**
@@ -66,7 +93,7 @@ class Company
 
 	/**
 	 * Get users
-	 * @return User[]
+	 * @return ArrayCollection<User>
 	 */
 	public function getUsers()
 	{
@@ -90,6 +117,35 @@ class Company
 	public function removeUser($user)
 	{
 		$this->users->removeElement($user);
+		return $this;
+	}
+
+	/**
+	 * Get variables
+	 * @return ArrayCollection<Variable>
+	 */
+	public function getVariables()
+	{
+		return $this->variables;
+	}
+
+	/**
+	 * @param Variable $variable
+	 * @return Company
+	 */
+	public function addVariable($variable)
+	{
+		$this->variables->add($variable);
+		return $this;
+	}
+
+	/**
+	 * @param Variable $variable
+	 * @return Company
+	 */
+	public function removeVariable($variable)
+	{
+		$this->variables->removeElement($variable);
 		return $this;
 	}
 
@@ -127,5 +183,15 @@ class Company
 	{
 		$this->isEnabled = $isEnabled;
 		return $this;
+	}
+
+	public function getCreated()
+	{
+		return $this->created;
+	}
+
+	public function getUpdated()
+	{
+		return $this->updated;
 	}
 }
