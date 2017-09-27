@@ -57,9 +57,35 @@ Simplifying control over multimedia communication.
 		- Recipient Channel Provider (Gmail, Verizon etc.)
 
 ---
-	variable
-	list
-	variable_list
+	recipient_bucket_variable
+	recipients
+	language
+	country
+	state
+	contact_info (phone# skype, email etc.)
+	
+	content
+	content_version/variant
+	~language
+	content_variable
+
+	channels
+	channel_type SMS|SMYP|SMSTP
+	account_abstract
+	sender
+	
+	history
+	~semder
+	~recipient
+	
+	
+	workflow
+	
+	shorturl
+	data chamger
+	
+	
+	reports
 	
 ---
 

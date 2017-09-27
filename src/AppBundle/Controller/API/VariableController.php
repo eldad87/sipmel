@@ -100,7 +100,7 @@ class VariableController extends FOSRestController
 	 *      description="Returned when successful.",
 	 *     	@SWG\Schema(
 	 *     		type="array",
-	 *      	@Model(type=Variable::class, groups={"save_response"})
+	 *      	@Model(type=Variable::class, groups={"list_response"})
 	 *	 	)
 	 * )
 	 *

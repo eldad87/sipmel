@@ -3,6 +3,7 @@
 namespace AppBundle\DataFixtures\ORM;
 
 use AppBundle\Entity\Company;
+use AppBundle\Entity\Content;
 use AppBundle\Entity\RecipientBucket;
 use AppBundle\Entity\User;
 use AppBundle\Entity\Variable;
@@ -34,10 +35,15 @@ class LoadData extends AbstractFixture implements FixtureInterface, ContainerAwa
 		$manager->persist($variable);
 		$manager->persist($variable2);
 
-		$recipientBucket = $this->generateRecipientBucker($company, 'bucket1');
-		$recipientBucket2 = $this->generateRecipientBucker($company, 'bucket2');
+		$recipientBucket = $this->generateRecipientBucket($company, 'bucket1');
+		$recipientBucket2 = $this->generateRecipientBucket($company, 'bucket2');
 		$manager->persist($recipientBucket);
 		$manager->persist($recipientBucket2);
+
+		$content = $this->generateContent($company, 'content1_en', 'en');
+		$content2 = $this->generateContent($company, 'content2_fr', 'fr');
+		$manager->persist($content);
+		$manager->persist($content2);
 
 		$this->setReference($user->getUsername(), $user);
 
@@ -48,7 +54,16 @@ class LoadData extends AbstractFixture implements FixtureInterface, ContainerAwa
 
 
 
-    private function generateRecipientBucker(Company $company, $name='buck')
+    private function generateContent(Company $company, $name='content', $fallbackLanguage='en')
+	{
+		$content = new Content();
+		$content->setCompany($company);
+		$content->setName($name);
+		$content->setFallbackLanguage($fallbackLanguage);
+		return $content;
+	}
+
+    private function generateRecipientBucket(Company $company, $name='buck')
 	{
 		$recipientBucket = new RecipientBucket();
 		$recipientBucket->setCompany($company);
@@ -70,7 +85,7 @@ class LoadData extends AbstractFixture implements FixtureInterface, ContainerAwa
 	 * @param boolean $isEnabled
 	 * @return Company
 	 */
-    private function generateCompany($name='cName', $isEnabled=true)
+    private function generateCompany($name='company', $isEnabled=true)
 	{
 		$company = new Company();
 		$company->setName($name);

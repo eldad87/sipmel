@@ -26,7 +26,7 @@ class Variable implements CompanyAwareInterface
      * @ORM\Column(type="integer")
 	 *
 	 * @JMS\Expose()
-	 * @JMS\Groups({"save_response"})
+	 * @JMS\Groups({"save_response", "list_response"})
 	 * @JMS\Type(name="integer")
      */
     private $id;
@@ -44,11 +44,12 @@ class Variable implements CompanyAwareInterface
 
     /**
 	 * @Assert\Length(min="2", max="25", groups={"save"})
+	 * @Assert\NotBlank(groups={"save"})
 	 *
 	 * @ORM\Column(type="string", length=25, nullable=false)
 	 *
 	 * @JMS\Expose()
-	 * @JMS\Groups({"save", "save_response"})
+	 * @JMS\Groups({"save", "save_response", "list_response"})
 	 * @JMS\Type(name="string")
      */
     private $name;
@@ -58,6 +59,10 @@ class Variable implements CompanyAwareInterface
 	 *
 	 * @Gedmo\Timestampable(on="create")
 	 * @ORM\Column(type="datetime")
+	 *
+	 * @JMS\Expose()
+	 * @JMS\Groups({"list_response"})
+	 * @JMS\Type(name="DateTime<'Y-m-d H:i:s'>")
 	 */
 	private $created;
 
@@ -66,6 +71,10 @@ class Variable implements CompanyAwareInterface
 	 *
 	 * @Gedmo\Timestampable(on="update")
 	 * @ORM\Column(type="datetime")
+	 *
+	 * @JMS\Expose()
+	 * @JMS\Groups({"list_response"})
+	 * @JMS\Type(name="DateTime<'Y-m-d H:i:s'>")
 	 */
 	private $updated;
 

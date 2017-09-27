@@ -11,14 +11,14 @@ use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * @ORM\Entity()
- * @ORM\Table(name="recipient_list", uniqueConstraints={
+ * @ORM\Table(name="content", uniqueConstraints={
  *     @ORM\UniqueConstraint(columns={"company_id", "name"})
  * })
  * @UniqueEntity(fields={"company", "name"}, groups={"save"})
  *
  * @JMS\ExclusionPolicy("all")
  */
-class RecipientBucket implements CompanyAwareInterface
+class Content implements CompanyAwareInterface
 {
     /**
      * @ORM\Id
@@ -35,7 +35,7 @@ class RecipientBucket implements CompanyAwareInterface
 	 * @var Company
 	 * @Assert\NotBlank(groups={"save"})
 	 *
-	 * @ORM\ManyToOne(targetEntity="Company", inversedBy="recipientBuckets")
+	 * @ORM\ManyToOne(targetEntity="Company", inversedBy="contents")
 	 * @ORM\JoinColumn(name="company_id", referencedColumnName="id", nullable=false)
 	 *
 	 * @JMS\Type("AppBundle\Entity\Company")
@@ -53,6 +53,19 @@ class RecipientBucket implements CompanyAwareInterface
 	 * @JMS\Type(name="string")
      */
     private $name;
+
+    /**
+	 * @Assert\Length(min="2", max="25", groups={"save"})
+	 * @Assert\Language(groups={"save"})
+	 * @Assert\NotBlank(groups={"save"})
+	 *
+	 * @ORM\Column(type="string", length=25, nullable=false)
+	 *
+	 * @JMS\Expose()
+	 * @JMS\Groups({"save", "save_response", "list_response"})
+	 * @JMS\Type(name="string")
+     */
+    private $fallbackLanguage;
 
 	/**
 	 * @var \DateTime $created
@@ -96,7 +109,7 @@ class RecipientBucket implements CompanyAwareInterface
 
 	/**
 	 * @param Company $company
-	 * @return $this
+	 * @return Content
 	 */
 	public function setCompany(Company $company)
 	{
@@ -114,7 +127,7 @@ class RecipientBucket implements CompanyAwareInterface
 
 	/**
 	 * @param mixed $name
-	 * @return $this
+	 * @return Content
 	 */
 	public function setName($name)
 	{
@@ -130,5 +143,21 @@ class RecipientBucket implements CompanyAwareInterface
 	public function getUpdated()
 	{
 		return $this->updated;
+	}
+
+	/**
+	 * @return string ISO 639-1
+	 */
+	public function getFallbackLanguage()
+	{
+		return $this->fallbackLanguage;
+	}
+
+	/**
+	 * @param string $fallbackLanguage
+	 */
+	public function setFallbackLanguage($fallbackLanguage)
+	{
+		$this->fallbackLanguage = $fallbackLanguage;
 	}
 }

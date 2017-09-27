@@ -79,13 +79,6 @@ class WebAuthTestCase extends WebTestCase
 			'--env'				=>'test',
 			'--no-interaction'	=>true
 		)));
-
-		/* Same as self::createSchema()
-		$this->runCommand('doctrine:schema:update', array(
-			'--env'				=>'test',
-			'--force'			=>true,
-			'--no-interaction'	=>true
-		));*/
 	}
 
 	protected function createSchema(array $metadata=null, $emNam=null)

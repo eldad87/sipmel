@@ -7,13 +7,13 @@ use Doctrine\Common\DataFixtures\ReferenceRepository;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * @group RecipientBucket
+ * @group Content
  * @group v1
  *
- * Class RecipientBucketControllerTest
+ * Class ContentControllerTest
  * @package Tests\AppBundle\Controller
  */
-class RecipientBucketControllerTest extends WebAuthTestCase
+class ContentControllerTest extends WebAuthTestCase
 {
 	/** @var ReferenceRepository */
 	protected $referenceRepository;
@@ -31,40 +31,44 @@ class RecipientBucketControllerTest extends WebAuthTestCase
 		)->getReferenceRepository();
 	}
 
-	public function testRecipientBucketList()
+	public function testContentList()
 	{
 		$this->loginAs($this->referenceRepository->getReference('adminusername'), 'api_private');
 		$client = $this->makeClient(true);
 
 		$client->request(
 			Request::METHOD_GET,
-			'/API/v1/Recipient/Bucket' . $this->getUrl('recipient_bucket_list')
+			'/API/v1/Content' . $this->getUrl('content_list')
 		);
 
-		//$this->assertEquals('[{"id":1,"name":"bucket1"},{"id":2,"name":"bucket2"}]', $client->getResponse()->getContent());
+		//$this->assertEquals('[{"id":1,"name":"content1_en","fallback_language":"en"},{"id":2,"name":"content2_fr","fallback_language":"fr"}]', $client->getResponse()->getContent());
 		$res = json_decode($client->getResponse()->getContent(), true);
-		$this->assertEquals('bucket1', $res[0]['name']);
-		$this->assertEquals('bucket2', $res[1]['name']);
+		$this->assertEquals('content1_en', $res[0]['name']);
+		$this->assertEquals('en', $res[0]['fallback_language']);
+		$this->assertEquals('content2_fr', $res[1]['name']);
+		$this->assertEquals('fr', $res[1]['fallback_language']);
 		$this->assertEquals(200, $client->getResponse()->getStatusCode());
 	}
 
-	public function testRecipientBucketAdd()
+	public function testContentAdd()
 	{
 		$client = static::createAuthenticatedClient('adminusername', '123456');
 		$client->request(
 			Request::METHOD_POST,
-			'/API/v1/Recipient/Bucket' . $this->getUrl('recipient_bucket_add'),
+			'/API/v1/Content' . $this->getUrl('content_add'),
 			array(),
 			array(),
 			array(),
 			json_encode(array(
-				'name'			=>'bucket3'
+				'name'			=>'content3',
+				'fallback_language'		=>'de'
 			))
 		);
 
-		//$this->assertEquals('{"id":3,"name":"bucket3"}', $client->getResponse()->getContent());
+		//$this->assertEquals('{"id":3,"name":"content3","fallback_language":"de"}', $client->getResponse()->getContent());
 		$res = json_decode($client->getResponse()->getContent(), true);
-		$this->assertEquals('bucket3', $res['name']);
+		$this->assertEquals('content3', $res['name']);
+		$this->assertEquals('de', $res['fallback_language']);
 		$this->assertEquals(200, $client->getResponse()->getStatusCode());
 	}
 }

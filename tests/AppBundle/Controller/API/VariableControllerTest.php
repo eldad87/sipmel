@@ -51,13 +51,9 @@ class VariableControllerTest extends WebAuthTestCase
 	public function testVariableAdd()
 	{
 		$client = static::createAuthenticatedClient('adminusername', '123456');
-
-		/** @var User $user */
-		$user = $this->referenceRepository->getReference('adminusername');
-
 		$client->request(
 			Request::METHOD_POST,
-			'/API/v1/Variable' . $this->getUrl('variable_list'),
+			'/API/v1/Variable' . $this->getUrl('variable_add'),
 			array(),
 			array(),
 			array(),

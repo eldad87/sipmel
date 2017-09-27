@@ -40,7 +40,16 @@ class Company
 	 *
 	 * @JMS\Type("ArrayCollection<AppBundle\Entity\Variable>"))
 	 */
-	private $variables;
+	private $variables;	
+	/**
+	 * @var ArrayCollection<Content>
+	 *
+	 * @ORM\OneToMany(targetEntity="Content", mappedBy="company", cascade={"persist", "remove"})
+	 *
+	 * @JMS\Type("ArrayCollection<AppBundle\Entity\Content>"))
+	 */
+	private $contents;
+	
 	/**
 	 * @var ArrayCollection<RecipientBucket>
 	 *
@@ -57,7 +66,7 @@ class Company
 	 * @ORM\Column(type="string", length=25, nullable=false)
 	 *
 	 * @JMS\Expose()
-	 * @JMS\Groups({"register", "register_response"})
+	 * @JMS\Groups({"register", "register_response", "list_response"})
 	 * @JMS\Type(name="string")
      */
     private $name;
@@ -73,6 +82,10 @@ class Company
 	 *
 	 * @Gedmo\Timestampable(on="create")
 	 * @ORM\Column(type="datetime")
+	 *
+	 * @JMS\Expose()
+	 * @JMS\Groups({"list_response"})
+	 * @JMS\Type(name="DateTime<'Y-m-d H:i:s'>")
 	 */
 	private $created;
 
@@ -81,6 +94,10 @@ class Company
 	 *
 	 * @Gedmo\Timestampable(on="update")
 	 * @ORM\Column(type="datetime")
+	 *
+	 * @JMS\Expose()
+	 * @JMS\Groups({"list_response"})
+	 * @JMS\Type(name="DateTime<'Y-m-d H:i:s'>")
 	 */
 	private $updated;
 
@@ -155,6 +172,35 @@ class Company
 	public function removeVariable($variable)
 	{
 		$this->variables->removeElement($variable);
+		return $this;
+	}
+
+	/**
+	 * Get contents
+	 * @return ArrayCollection<Content>
+	 */
+	public function getContents()
+	{
+		return $this->contents;
+	}
+
+	/**
+	 * @param Content $content
+	 * @return Company
+	 */
+	public function addContent($content)
+	{
+		$this->contents->add($content);
+		return $this;
+	}
+
+	/**
+	 * @param Content $content
+	 * @return Company
+	 */
+	public function removeContent($content)
+	{
+		$this->contents->removeElement($content);
 		return $this;
 	}
 

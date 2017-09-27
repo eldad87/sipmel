@@ -50,22 +50,24 @@ class User implements UserInterface, CompanyAwareInterface
 
     /**
 	 * @Assert\Length(min="2", max="25", groups={"register"})
+	 * @Assert\NotBlank(groups={"save"})
 	 *
 	 * @ORM\Column(type="string", length=25, nullable=false)
 	 *
 	 * @JMS\Expose()
-	 * @JMS\Groups({"register", "register_response"})
+	 * @JMS\Groups({"register", "register_response", "list_response"})
 	 * @JMS\Type(name="string")
      */
     private $firstName;
 
     /**
 	 * @Assert\Length(min="2", max="25", groups={"register"})
+	 * @Assert\NotBlank(groups={"save"})
 	 *
 	 * @ORM\Column(type="string", length=25, nullable=false)
 	 *
 	 * @JMS\Expose()
-	 * @JMS\Groups({"register", "register_response"})
+	 * @JMS\Groups({"register", "register_response", "list_response"})
 	 * @JMS\Type(name="string")
      */
     private $lastName;
@@ -73,11 +75,12 @@ class User implements UserInterface, CompanyAwareInterface
     /**
 	 *
 	 * @Assert\Length(min="5", max="25", groups={"register"})
+	 * @Assert\NotBlank(groups={"save"})
 	 *
 	 * @ORM\Column(type="string", unique=true, length=25, nullable=false)
 	 *
 	 * @JMS\Expose()
-	 * @JMS\Groups({"register", "register_response", "login"})
+	 * @JMS\Groups({"register", "register_response", "login", "list_response"})
 	 * @JMS\Type(name="string")
      */
     private $username;
@@ -85,17 +88,19 @@ class User implements UserInterface, CompanyAwareInterface
     /**
 	 * @Assert\Length(min="5", max="50", groups={"register"})
 	 * @Assert\Email(groups={"register"})
+	 * @Assert\NotBlank(groups={"save"})
 	 *
 	 * @ORM\Column(type="string", unique=true, length=50, nullable=false)
 	 *
 	 * @JMS\Expose()
-	 * @JMS\Groups({"register", "register_response"})
+	 * @JMS\Groups({"register", "register_response", "list_response"})
 	 * @JMS\Type(name="string")
      */
     private $email;
 
     /**
 	 * @ORM\Column(type="string", length=72, nullable=false)
+	 * @Assert\NotBlank(groups={"save"})
 	 *
 	 * @JMS\Expose()
 	 * @JMS\Groups({"register", "login"})
@@ -113,6 +118,10 @@ class User implements UserInterface, CompanyAwareInterface
 	 *
 	 * @Gedmo\Timestampable(on="create")
 	 * @ORM\Column(type="datetime")
+	 *
+	 * @JMS\Expose()
+	 * @JMS\Groups({"list_response"})
+	 * @JMS\Type(name="DateTime<'Y-m-d H:i:s'>")
 	 */
 	private $created;
 
@@ -121,6 +130,10 @@ class User implements UserInterface, CompanyAwareInterface
 	 *
 	 * @Gedmo\Timestampable(on="update")
 	 * @ORM\Column(type="datetime")
+	 *
+	 * @JMS\Expose()
+	 * @JMS\Groups({"list_response"})
+	 * @JMS\Type(name="DateTime<'Y-m-d H:i:s'>")
 	 */
 	private $updated;
 
