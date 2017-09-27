@@ -7,13 +7,13 @@ use Doctrine\Common\DataFixtures\ReferenceRepository;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * @group RecipientBucket
+ * @group Bucket
  * @group v1
  *
- * Class RecipientBucketControllerTest
+ * Class BucketControllerTest
  * @package Tests\AppBundle\Controller
  */
-class RecipientBucketControllerTest extends WebAuthTestCase
+class BucketControllerTest extends WebAuthTestCase
 {
 	/** @var ReferenceRepository */
 	protected $referenceRepository;
@@ -31,14 +31,14 @@ class RecipientBucketControllerTest extends WebAuthTestCase
 		)->getReferenceRepository();
 	}
 
-	public function testRecipientBucketList()
+	public function testBucketList()
 	{
 		$this->loginAs($this->referenceRepository->getReference('adminusername'), 'api_private');
 		$client = $this->makeClient(true);
 
 		$client->request(
 			Request::METHOD_GET,
-			'/API/v1/Recipient/Bucket' . $this->getUrl('recipient_bucket_list')
+			'/API/v1/Bucket' . $this->getUrl('bucket_list')
 		);
 
 		//$this->assertEquals('[{"id":1,"name":"bucket1"},{"id":2,"name":"bucket2"}]', $client->getResponse()->getContent());
@@ -48,12 +48,12 @@ class RecipientBucketControllerTest extends WebAuthTestCase
 		$this->assertEquals(200, $client->getResponse()->getStatusCode());
 	}
 
-	public function testRecipientBucketAdd()
+	public function testBucketAdd()
 	{
 		$client = static::createAuthenticatedClient('adminusername', '123456');
 		$client->request(
 			Request::METHOD_POST,
-			'/API/v1/Recipient/Bucket' . $this->getUrl('recipient_bucket_add'),
+			'/API/v1/Bucket' . $this->getUrl('bucket_add'),
 			array(),
 			array(),
 			array(),

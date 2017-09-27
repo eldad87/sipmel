@@ -11,14 +11,14 @@ use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * @ORM\Entity()
- * @ORM\Table(name="recipient_list", uniqueConstraints={
+ * @ORM\Table(name="bucket", uniqueConstraints={
  *     @ORM\UniqueConstraint(columns={"company_id", "name"})
  * })
  * @UniqueEntity(fields={"company", "name"}, groups={"save"})
  *
  * @JMS\ExclusionPolicy("all")
  */
-class RecipientBucket implements CompanyAwareInterface
+class Bucket implements CompanyAwareInterface
 {
     /**
      * @ORM\Id
@@ -35,7 +35,7 @@ class RecipientBucket implements CompanyAwareInterface
 	 * @var Company
 	 * @Assert\NotBlank(groups={"save"})
 	 *
-	 * @ORM\ManyToOne(targetEntity="Company", inversedBy="recipientBuckets")
+	 * @ORM\ManyToOne(targetEntity="Company", inversedBy="buckets")
 	 * @ORM\JoinColumn(name="company_id", referencedColumnName="id", nullable=false)
 	 *
 	 * @JMS\Type("AppBundle\Entity\Company")

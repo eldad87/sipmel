@@ -51,13 +51,13 @@ class Company
 	private $contents;
 	
 	/**
-	 * @var ArrayCollection<RecipientBucket>
+	 * @var ArrayCollection<Bucket>
 	 *
-	 * @ORM\OneToMany(targetEntity="Variable", mappedBy="company", cascade={"persist", "remove"})
+	 * @ORM\OneToMany(targetEntity="Bucket", mappedBy="company", cascade={"persist", "remove"})
 	 *
-	 * @JMS\Type("ArrayCollection<AppBundle\Entity\RecipientBucket>"))
+	 * @JMS\Type("ArrayCollection<AppBundle\Entity\Bucket>"))
 	 */
-	private $recipientBuckets;
+	private $buckets;
 
     /**
 	 * @Assert\Length(min="2", max="25", groups={"register"})
@@ -214,7 +214,7 @@ class Company
 	}
 
 	/**
-	 * @param RecipientBucket $recipientBucket
+	 * @param Bucket $recipientBucket
 	 * @return Company
 	 */
 	public function addRecipientBucket($recipientBucket)
@@ -224,7 +224,7 @@ class Company
 	}
 
 	/**
-	 * @param RecipientBucket $recipientBucket
+	 * @param Bucket $recipientBucket
 	 * @return Company
 	 */
 	public function removeRecipientBucket($recipientBucket)

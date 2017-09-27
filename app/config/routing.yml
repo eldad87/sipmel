@@ -34,10 +34,10 @@ REST_Content:
     requirements:
         version: v1
 
-REST_RecipientBucket:
-    resource: "@AppBundle/Controller/API/RecipientBucketController.php"
+REST_Bucket:
+    resource: "@AppBundle/Controller/API/BucketController.php"
     type: rest
-    prefix: /API/{version}/Recipient/Bucket
+    prefix: /API/{version}/Bucket
     #name_prefix:  api_user_
     requirements:
         version: v1

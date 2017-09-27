@@ -4,7 +4,7 @@ namespace AppBundle\DataFixtures\ORM;
 
 use AppBundle\Entity\Company;
 use AppBundle\Entity\Content;
-use AppBundle\Entity\RecipientBucket;
+use AppBundle\Entity\Bucket;
 use AppBundle\Entity\User;
 use AppBundle\Entity\Variable;
 use Doctrine\Common\DataFixtures\FixtureInterface;
@@ -35,10 +35,10 @@ class LoadData extends AbstractFixture implements FixtureInterface, ContainerAwa
 		$manager->persist($variable);
 		$manager->persist($variable2);
 
-		$recipientBucket = $this->generateRecipientBucket($company, 'bucket1');
-		$recipientBucket2 = $this->generateRecipientBucket($company, 'bucket2');
-		$manager->persist($recipientBucket);
-		$manager->persist($recipientBucket2);
+		$bucket = $this->generateBucket($company, 'bucket1');
+		$bucket2 = $this->generateBucket($company, 'bucket2');
+		$manager->persist($bucket);
+		$manager->persist($bucket2);
 
 		$content = $this->generateContent($company, 'content1_en', 'en');
 		$content2 = $this->generateContent($company, 'content2_fr', 'fr');
@@ -52,8 +52,6 @@ class LoadData extends AbstractFixture implements FixtureInterface, ContainerAwa
 		return true;
 	}
 
-
-
     private function generateContent(Company $company, $name='content', $fallbackLanguage='en')
 	{
 		$content = new Content();
@@ -63,12 +61,12 @@ class LoadData extends AbstractFixture implements FixtureInterface, ContainerAwa
 		return $content;
 	}
 
-    private function generateRecipientBucket(Company $company, $name='buck')
+    private function generateBucket(Company $company, $name='buck')
 	{
-		$recipientBucket = new RecipientBucket();
-		$recipientBucket->setCompany($company);
-		$recipientBucket->setName($name);
-		return $recipientBucket;
+		$bucket = new Bucket();
+		$bucket->setCompany($company);
+		$bucket->setName($name);
+		return $bucket;
 	}
 
     private function generateVariable(Company $company, $name='var')
