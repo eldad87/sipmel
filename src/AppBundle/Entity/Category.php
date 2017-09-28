@@ -3,6 +3,7 @@
 namespace AppBundle\Entity;
 
 use AppBundle\Request\API\CompanyAwareInterface;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -11,14 +12,14 @@ use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * @ORM\Entity()
- * @ORM\Table(name="bucket", uniqueConstraints={
+ * @ORM\Table(name="category", uniqueConstraints={
  *     @ORM\UniqueConstraint(columns={"company_id", "name"})
  * })
  * @UniqueEntity(fields={"name", "company"}, groups={"save"})
  *
  * @JMS\ExclusionPolicy("all")
  */
-class Bucket implements CompanyAwareInterface
+class Category implements CompanyAwareInterface
 {
     /**
      * @ORM\Id
@@ -35,7 +36,7 @@ class Bucket implements CompanyAwareInterface
 	 * @var Company
 	 * @Assert\NotBlank(groups={"save"})
 	 *
-	 * @ORM\ManyToOne(targetEntity="Company", inversedBy="buckets")
+	 * @ORM\ManyToOne(targetEntity="Company", inversedBy="categories")
 	 * @ORM\JoinColumn(name="company_id", referencedColumnName="id", nullable=false)
 	 *
 	 * @JMS\Type("AppBundle\Entity\Company")
@@ -53,6 +54,15 @@ class Bucket implements CompanyAwareInterface
 	 * @JMS\Type(name="string")
      */
     private $name;
+
+	/**
+	 * @var ArrayCollection<Content>
+	 *
+	 * @ORM\OneToMany(targetEntity="Content", mappedBy="category", cascade={"persist", "remove"})
+	 *
+	 * @JMS\Type("ArrayCollection<AppBundle\Entity\Content>"))
+	 */
+	private $contents;
 
 	/**
 	 * @var \DateTime $created
@@ -96,7 +106,7 @@ class Bucket implements CompanyAwareInterface
 
 	/**
 	 * @param Company $company
-	 * @return $this
+	 * @return Category
 	 */
 	public function setCompany(Company $company)
 	{
@@ -114,11 +124,41 @@ class Bucket implements CompanyAwareInterface
 
 	/**
 	 * @param mixed $name
-	 * @return $this
+	 * @return Category
 	 */
 	public function setName($name)
 	{
 		$this->name = $name;
+		return $this;
+	}
+
+
+	/**
+	 * Get contents
+	 * @return ArrayCollection<Content>
+	 */
+	public function getContents()
+	{
+		return $this->contents;
+	}
+
+	/**
+	 * @param Content $content
+	 * @return Company
+	 */
+	public function addContent($content)
+	{
+		$this->contents->add($content);
+		return $this;
+	}
+
+	/**
+	 * @param Content $content
+	 * @return Company
+	 */
+	public function removeContent($content)
+	{
+		$this->contents->removeElement($content);
 		return $this;
 	}
 

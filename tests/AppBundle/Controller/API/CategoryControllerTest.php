@@ -7,13 +7,13 @@ use Doctrine\Common\DataFixtures\ReferenceRepository;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * @group Content
+ * @group Category
  * @group v1
  *
- * Class ContentControllerTest
+ * Class CategoryControllerTest
  * @package Tests\AppBundle\Controller
  */
-class ContentControllerTest extends WebAuthTestCase
+class CategoryControllerTest extends WebAuthTestCase
 {
 	/** @var ReferenceRepository */
 	protected $referenceRepository;
@@ -31,43 +31,40 @@ class ContentControllerTest extends WebAuthTestCase
 		)->getReferenceRepository();
 	}
 
-	public function testContentList()
+	public function testCategoryList()
 	{
 		$this->loginAs($this->referenceRepository->getReference('adminusername'), 'api_private');
 		$client = $this->makeClient(true);
 
 		$client->request(
 			Request::METHOD_GET,
-			'/API/v1/Content' . $this->getUrl('content_list_by_categoty', array('category'=>2))
+			'/API/v1/Category' . $this->getUrl('category_list')
 		);
 
+		//$this->assertEquals('[{"id":1,"name":"var1"},{"id":2,"name":"var2"}]', $client->getResponse()->getContent());
 		$res = json_decode($client->getResponse()->getContent(), true);
-		/*$this->assertEquals('content1_en', $res[0]['name']);
-		$this->assertEquals('en', $res[0]['fallback_language']);*/
-		$this->assertEquals('content2_fr', $res[0]['name']);
-		$this->assertEquals('fr', $res[0]['fallback_language']);
+		$this->assertEquals('category1', $res[0]['name']);
+		$this->assertEquals('category2', $res[1]['name']);
 		$this->assertEquals(200, $client->getResponse()->getStatusCode());
 	}
 
-	public function testContentAdd()
+	public function testCategoryAdd()
 	{
 		$client = static::createAuthenticatedClient('adminusername', '123456');
 		$client->request(
 			Request::METHOD_POST,
-			'/API/v1/Content' . $this->getUrl('content_add_to_category', array('category'=>2)),
+			'/API/v1/Category' . $this->getUrl('category_add'),
 			array(),
 			array(),
 			array(),
 			json_encode(array(
-				'name'			=>'content3',
-				'fallback_language'		=>'de'
+				'name'			=>'category3'
 			))
 		);
 
-		//$this->assertEquals('{"id":3,"name":"content3","fallback_language":"de"}', $client->getResponse()->getContent());
+		//$this->assertEquals('{"id":3,"name":"category3"}', $client->getResponse()->getContent());
 		$res = json_decode($client->getResponse()->getContent(), true);
-		$this->assertEquals('content3', $res['name']);
-		$this->assertEquals('de', $res['fallback_language']);
+		$this->assertEquals('category3', $res['name']);
 		$this->assertEquals(200, $client->getResponse()->getStatusCode());
 	}
 }

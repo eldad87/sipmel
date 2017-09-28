@@ -40,7 +40,17 @@ class Company
 	 *
 	 * @JMS\Type("ArrayCollection<AppBundle\Entity\Variable>"))
 	 */
-	private $variables;	
+	private $variables;
+
+	/**
+	 * @var ArrayCollection<Category>
+	 *
+	 * @ORM\OneToMany(targetEntity="Category", mappedBy="company", cascade={"persist", "remove"})
+	 *
+	 * @JMS\Type("ArrayCollection<AppBundle\Entity\Category>"))
+	 */
+	private $categories;
+
 	/**
 	 * @var ArrayCollection<Content>
 	 *
@@ -205,31 +215,60 @@ class Company
 	}
 
 	/**
-	 * Get recipientBuckets
-	 * @return ArrayCollection<RecipientBucket>
+	 * Get categories
+	 * @return ArrayCollection<Categories>
 	 */
-	public function getRecipientBuckets()
+	public function getCategories()
 	{
-		return $this->recipientBuckets;
+		return $this->categories;
 	}
 
 	/**
-	 * @param Bucket $recipientBucket
+	 * @param Category $category
 	 * @return Company
 	 */
-	public function addRecipientBucket($recipientBucket)
+	public function addCategory($category)
 	{
-		$this->recipientBuckets->add($recipientBucket);
+		$this->categorys->add($category);
 		return $this;
 	}
 
 	/**
-	 * @param Bucket $recipientBucket
+	 * @param Category $category
 	 * @return Company
 	 */
-	public function removeRecipientBucket($recipientBucket)
+	public function removeCategory($category)
 	{
-		$this->recipientBuckets->removeElement($recipientBucket);
+		$this->categorys->removeElement($category);
+		return $this;
+	}
+
+	/**
+	 * Get recipientBuckets
+	 * @return ArrayCollection<RecipientBucket>
+	 */
+	public function getBuckets()
+	{
+		return $this->buckets;
+	}
+
+	/**
+	 * @param Bucket $bucket
+	 * @return Company
+	 */
+	public function addBucket($bucket)
+	{
+		$this->buckets->add($bucket);
+		return $this;
+	}
+
+	/**
+	 * @param Bucket $bucket
+	 * @return Company
+	 */
+	public function removeBucket($bucket)
+	{
+		$this->buckets->removeElement($bucket);
 		return $this;
 	}
 

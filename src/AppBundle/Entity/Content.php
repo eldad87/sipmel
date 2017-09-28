@@ -12,9 +12,9 @@ use Gedmo\Mapping\Annotation as Gedmo;
 /**
  * @ORM\Entity()
  * @ORM\Table(name="content", uniqueConstraints={
- *     @ORM\UniqueConstraint(columns={"company_id", "name"})
+ *     @ORM\UniqueConstraint(columns={"company_id", "category_id", "name"})
  * })
- * @UniqueEntity(fields={"company", "name"}, groups={"save"})
+ * @UniqueEntity(fields={"name", "category"}, groups={"save"})
  *
  * @JMS\ExclusionPolicy("all")
  */
@@ -41,6 +41,19 @@ class Content implements CompanyAwareInterface
 	 * @JMS\Type("AppBundle\Entity\Company")
 	 */
 	private $company;
+
+	/**
+	 * @var Category
+	 * @Assert\NotBlank(groups={"save_attach"})
+	 *
+	 * @ORM\ManyToOne(targetEntity="Category", inversedBy="contents")
+	 * @ORM\JoinColumn(name="category_id", referencedColumnName="id", nullable=false)
+	 *
+	 * @JMS\Type("AppBundle\Entity\Category")
+	 * @JMS\Expose()
+	 * @JMS\Groups({"list_response", "save_response"})
+	 */
+	private $category;
 
     /**
 	 * @Assert\Length(min="2", max="25", groups={"save"})
@@ -114,6 +127,24 @@ class Content implements CompanyAwareInterface
 	public function setCompany(Company $company)
 	{
 		$this->company = $company;
+		return $this;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getCategory()
+	{
+		return $this->category;
+	}
+
+	/**
+	 * @param mixed $category
+	 * @return Content
+	 */
+	public function setCategory($category)
+	{
+		$this->category = $category;
 		return $this;
 	}
 

@@ -26,9 +26,18 @@ REST_Variable:
     requirements:
         version: v1
 
-REST_Content:
+REST_Category:
+    resource: "@AppBundle/Controller/API/CategoryController.php"
+    type: rest
+    prefix: /API/{version}/Category
+    #name_prefix:  api_user_
+    requirements:
+        version: v1
+
+REST_Category_Content:
     resource: "@AppBundle/Controller/API/ContentController.php"
     type: rest
+#    prefix: /API/{version}/Category/{category}/Content
     prefix: /API/{version}/Content
     #name_prefix:  api_user_
     requirements:

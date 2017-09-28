@@ -14,7 +14,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
  * @ORM\Table(name="variable", uniqueConstraints={
  *     @ORM\UniqueConstraint(columns={"company_id", "name"})
  * })
- * @UniqueEntity(fields={"company", "name"}, groups={"save"})
+ * @UniqueEntity(fields={"name", "company"}, groups={"save"})
  *
  * @JMS\ExclusionPolicy("all")
  */

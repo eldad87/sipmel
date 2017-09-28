@@ -2,6 +2,7 @@
 
 namespace AppBundle\DataFixtures\ORM;
 
+use AppBundle\Entity\Category;
 use AppBundle\Entity\Company;
 use AppBundle\Entity\Content;
 use AppBundle\Entity\Bucket;
@@ -24,7 +25,9 @@ class LoadData extends AbstractFixture implements FixtureInterface, ContainerAwa
 	{
 
 		$company = $this->generateCompany('cName');
+		$company2 = $this->generateCompany('cNamew');
 		$manager->persist($company);
+		$manager->persist($company2);
 		$manager->flush();
 
 		$user = $this->generateUser($company, 'adminusername@local.local', 'adminusername', 123456);
@@ -40,10 +43,20 @@ class LoadData extends AbstractFixture implements FixtureInterface, ContainerAwa
 		$manager->persist($bucket);
 		$manager->persist($bucket2);
 
-		$content = $this->generateContent($company, 'content1_en', 'en');
-		$content2 = $this->generateContent($company, 'content2_fr', 'fr');
+		$category = $this->generateCategory($company, 'category1');
+		$category2 = $this->generateCategory($company, 'category2');
+		$category3 = $this->generateCategory($company2, 'category3_customer2');
+		$manager->persist($category);
+		$manager->persist($category2);
+		$manager->persist($category3);
+		$manager->flush();
+
+		$content = $this->generateContent($category, 'content1_en', 'en');
+		$content2 = $this->generateContent($category2, 'content2_fr', 'fr');
+		$content3 = $this->generateContent($category3, 'content3_customer2', 'fr');
 		$manager->persist($content);
 		$manager->persist($content2);
+		$manager->persist($content3);
 
 		$this->setReference($user->getUsername(), $user);
 
@@ -52,13 +65,21 @@ class LoadData extends AbstractFixture implements FixtureInterface, ContainerAwa
 		return true;
 	}
 
-    private function generateContent(Company $company, $name='content', $fallbackLanguage='en')
+    private function generateContent(Category $category, $name='content', $fallbackLanguage='en')
 	{
 		$content = new Content();
-		$content->setCompany($company);
 		$content->setName($name);
 		$content->setFallbackLanguage($fallbackLanguage);
+		$content->setCompany($category->getCompany());
+		$content->setCategory($category);
 		return $content;
+	}
+    private function generateCategory(Company $company, $name='category')
+	{
+		$category = new Category();
+		$category->setCompany($company);
+		$category->setName($name);
+		return $category;
 	}
 
     private function generateBucket(Company $company, $name='buck')

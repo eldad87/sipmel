@@ -3,9 +3,11 @@
 namespace AppBundle\Controller\API;
 
 
+use AppBundle\Entity\Category;
 use AppBundle\Entity\User;
 use AppBundle\Entity\Content;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\FOSRestController;
 
@@ -24,9 +26,8 @@ use Swagger\Annotations as SWG;
  */
 class ContentController extends FOSRestController
 {
-
 	/**
-	 * @Rest\Post(path="", name="content_add")
+	 * @Rest\Post(path="Category/{category}", name="content_add_to_category")
 	 *
 	 * @SWG\Parameter(
 	 * 		name="version",
@@ -35,6 +36,13 @@ class ContentController extends FOSRestController
 	 *      type="string",
 	 *      required=true,
 	 *      enum={"v1"}
+	 * )
+	 * @SWG\Parameter(
+	 * 		name="category_id",
+	 *      in="path",
+	 *      description="Category Id",
+	 *      type="integer",
+	 *      required=true
 	 * )
 	 *
 	 * @SWG\Parameter(
@@ -69,11 +77,20 @@ class ContentController extends FOSRestController
 	 *
 	 * @return View
 	 * @ParamConverter("content", converter="fos_rest.request_body", options={"validator"={"groups"="save"}, "deserializationContext"={"CompanyAware"=true,"groups"={"save"}}})
+	 * @ParamConverter("category", options={"id" = "category"})
 	 */
-	public function addAction(Content $content, ConstraintViolationList $validationErrors)
+	public function addAction(Content $content, Category $category)
 	{
+		$content->setCategory($category);
+		$validator = $this->get('validator');
+		$validationErrors = $validator->validate($content);
+
 		if (count($validationErrors)) {
 			return $this->view($validationErrors, Response::HTTP_BAD_REQUEST);
+		}
+
+		if($category->getCompany() != $this->getUser()->getCompany()) {
+			return $this->view([['property_path' => 'category_id', 'message' => 'Category is invalid']], 401); //TODO: constrain or something more 2017..
 		}
 
 		$em = $this->getDoctrine()->getManager();
@@ -81,10 +98,15 @@ class ContentController extends FOSRestController
 		$em->flush();
 
 		return $this->view($content, 200);
+
+		//TODO: use annotation if="" to check if both content.companye = category.company
+		//You can use @accessor
+		//@MaxDepth
+		//@map=true comma ceparated ids
 	}
 
 	/**
-	 * @Rest\Get(path="", name="content_list")
+	 * @Rest\Get(path="Category/{category}", name="content_list_by_categoty")
 	 *
 	 * @SWG\Parameter(
 	 * 		name="version",
@@ -93,6 +115,14 @@ class ContentController extends FOSRestController
 	 *      type="string",
 	 *      required=true,
 	 *      enum={"v1"}
+	 * )
+	 *
+	 * @SWG\Parameter(
+	 * 		name="category_id",
+	 *      in="path",
+	 *      description="Category Id",
+	 *      type="integer",
+	 *      required=true
 	 * )
 	 *
 	 * @SWG\Response(
@@ -107,14 +137,20 @@ class ContentController extends FOSRestController
 	 * @SWG\Tag(name="content.list", description="List Contents")
 	 *
 	 * @return View
+	 * @ParamConverter("category", options={"id" = "category"})
 	 */
-	public function listAction()
+	public function listAction(Category $category=null)
 	{
 		/** @var User $user */
 		$user = $this->getUser();
 
+		$criteria = array('company'=>$user->getCompany());
+		if($category) {
+			$criteria['category'] = $category;
+		}
+
 		$contents = $this->getDoctrine()->getRepository(Content::class)
-			->findByCompany($user->getCompany());
+			->findBy($criteria);
 		return $this->view($contents, 200);
 	}
 }
